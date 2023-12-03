@@ -22,7 +22,7 @@ npm run dev
 
 Este comando ejecuta el proyecto en entorno de desarrollo permitiendo la ejecucion de codigo TypeScript.
 
-### Build 
+### Seed
 
 ```bash
 npm run seed
