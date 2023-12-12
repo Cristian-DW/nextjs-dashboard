@@ -5,7 +5,7 @@ import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import { roboto } from '@/app/ui/fonts';
-import { RevenueChartSkeleton } from '../ui/skeletons';
+import { LatestInvoicesSkeleton, RevenueChartSkeleton } from '../ui/skeletons';
 export default async function Page() {
    
    const latestInvoices = await fetchLatestInvoices()
@@ -31,11 +31,12 @@ export default async function Page() {
         />
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-         <Suspense fallback={<div><RevenueChartSkeleton /></div>}> 
+         <Suspense fallback={<RevenueChartSkeleton />}> 
          <RevenueChart />
          </Suspense>
-       
+         <Suspense fallback={<LatestInvoicesSkeleton />}> 
         <LatestInvoices latestInvoices={latestInvoices} />
+        </Suspense>
       </div>
     </main>
   );

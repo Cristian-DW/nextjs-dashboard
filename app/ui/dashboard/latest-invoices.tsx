@@ -7,7 +7,7 @@ export default async function LatestInvoices({
   latestInvoices,
 }: {
   latestInvoices: LatestInvoice[];
-}) {
+}) { await new Promise((resolve) => setTimeout(resolve, 1500));
   return (
     <div className="flex w-full flex-col md:col-span-4 lg:col-span-4">
       <h2 className={`${roboto.className} mb-4 text-xl md:text-2xl`}>
