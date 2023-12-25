@@ -1,20 +1,19 @@
 # Dashboard con Next.js
 
 
-### Requisitos previos
+## Requisitos previos
 
 * Se requiere tener Node.js en su version v18.5.0 o mayor en la maquina instalado.
 * Se requiere tener npm en su version v8.12.1 o mayor en la maquina instalado.
 
-### Instalación 
+## Instalación 
 
 ```bash
 npm install
 ```
 
 
-
-### Desarrollo
+## Desarrollo
 
 ```bash
 npm run dev
@@ -22,7 +21,7 @@ npm run dev
 
 Este comando ejecuta el proyecto en entorno de desarrollo permitiendo la ejecucion de codigo TypeScript.
 
-### Seed
+## Seed
 
 ```bash
 npm run seed
@@ -30,7 +29,7 @@ npm run seed
 
 Este comando se utiliza para ejecutar un script de semilla (seed) en una aplicación Node.js. 
 
-### Build 
+## Build 
 
 ```bash
 npm run build
@@ -38,7 +37,7 @@ npm run build
 
 Este comando ejecuta la limpieza y compilacion del código TypeScript preparando el código para producción.
 
-### Start application
+## Start application
 
 ```bash
 npm run start
