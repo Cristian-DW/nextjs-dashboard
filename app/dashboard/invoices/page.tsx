@@ -5,6 +5,7 @@ import { CreateInvoice } from '@/app/ui/invoices/buttons';
 import { roboto} from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
+import { fetchInvoicesPages } from '@/app/lib/data';
  
 export default async function Page({
    searchParams}: {
@@ -15,7 +16,7 @@ export default async function Page({
 }) {
    const query = searchParams?.query || '';
    const currentPage = searchParams?.currentPage || 1;
-   const totalPages = await fetchInvoiceksPages(query);
+   const totalPages = await fetchInvoicesPages(query);
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
