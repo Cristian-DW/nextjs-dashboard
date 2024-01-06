@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@testing-library/react": ["../../node_modules/@testing-library/react"]
     }
   },
   "include": [
