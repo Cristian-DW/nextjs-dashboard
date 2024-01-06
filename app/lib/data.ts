@@ -11,17 +11,10 @@ import {
 import { formatCurrency } from './utils';
 
 export async function fetchRevenue() {
-  
-
   try {
-    
-
-    
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const data = await sql<Revenue>`SELECT * FROM revenue`;
-
-   
 
     return data.rows;
   } catch (error) {
@@ -53,7 +46,7 @@ export async function fetchLatestInvoices() {
 export async function fetchCardData() {
   try {
     await new Promise((resolve) => setTimeout(resolve, 3000));
-   
+
     const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
     const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
     const invoiceStatusPromise = sql`SELECT

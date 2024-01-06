@@ -1,17 +1,15 @@
 # Dashboard con Next.js 📊 📈
 
-
 ## Requisitos previos
 
-* Se requiere tener Node.js en su version v18.5.0 o mayor en la maquina instalado.
-* Se requiere tener npm en su version v8.12.1 o mayor en la maquina instalado.
+- Se requiere tener Node.js en su version v18.5.0 o mayor en la maquina instalado.
+- Se requiere tener npm en su version v8.12.1 o mayor en la maquina instalado.
 
-## Instalación 
+## Instalación
 
 ```bash
 npm install
 ```
-
 
 ## Desarrollo
 
@@ -27,9 +25,9 @@ Este comando ejecuta el proyecto en entorno de desarrollo permitiendo la ejecuci
 npm run seed
 ```
 
-Este comando se utiliza para ejecutar un script de semilla (seed) en una aplicación Node.js. 
+Este comando se utiliza para ejecutar un script de semilla (seed) en una aplicación Node.js.
 
-## Build 
+## Build
 
 ```bash
 npm run build
@@ -44,4 +42,3 @@ npm run start
 ```
 
 Este comando ejecuta la aplicacion en entorno de producción.
-

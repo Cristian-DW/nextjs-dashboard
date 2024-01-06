@@ -1,6 +1,5 @@
-import {audiowide, roboto} from './ui/fonts';
+import { audiowide, roboto } from './ui/fonts';
 import './ui/global.css';
-
 
 export default function RootLayout({
   children,
@@ -9,9 +8,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${roboto.className} antialiased`}>
-        {children}
-        </body>
+      <body className={`${roboto.className} antialiased`}>{children}</body>
     </html>
   );
 }

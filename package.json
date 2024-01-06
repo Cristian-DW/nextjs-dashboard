@@ -3,11 +3,11 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "test": "jest",
     "prettier": "prettier --write --ignore-unknown .",
     "prettier:check": "prettier --check --ignore-unknown .",
+    "seed": "node -r dotenv/config ./scripts/seed.js",
     "start": "next start",
-    "seed": "node -r dotenv/config ./scripts/seed.js"
+    "test": "jest"
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
