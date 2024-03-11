@@ -1,15 +1,25 @@
-# Dashboard con Next.js 📊 📈
+# Dashboard con Next.js 🚀📊
 
-## Requisitos previos
+## Descripción
 
-- Se requiere tener Node.js en su version v18.5.0 o mayor en la maquina instalado.
-- Se requiere tener npm en su version v8.12.1 o mayor en la maquina instalado.
+¡Bienvenido al Dashboard impulsado por Next.js, una plataforma potente para visualización de datos y análisis! Este proyecto ofrece una interfaz elegante y eficiente para controlar y analizar tus datos de manera intuitiva.
+
+## Características Principales
+
+- **Desarrollo Rápido:** Utiliza Next.js para un desarrollo ágil y eficiente, permitiendo la creación de componentes dinámicos con TypeScript.
+- **Semilla de Datos:** Inicia tu aplicación con datos significativos utilizando el comando `npm run seed` para un inicio más rápido y realista.
+- **Compilación Eficiente:** Optimiza tu código con el comando `npm run build`, asegurando una ejecución suave y eficaz en entornos de producción.
+- **Interfaz Responsiva:** Disfruta de una experiencia de usuario consistente en todos los dispositivos gracias a un diseño responsivo y amigable.
+
+## Requisitos Previos
+
+- Asegúrate de tener Node.js instalado en tu máquina, preferiblemente en la versión v18.5.0 o superior.
+- Asegúrate de tener npm instalado en tu máquina, preferiblemente en la versión v8.12.1 o superior.
 
 ## Instalación
 
 ```bash
 npm install
-```
 
 ## Desarrollo
 
@@ -38,7 +48,30 @@ Este comando ejecuta la limpieza y compilacion del código TypeScript preparando
 ## Start application
 
 ```bash
+
+
 npm run start
 ```
 
 Este comando ejecuta la aplicacion en entorno de producción.
+
+
+
+## Colaboración
+¡Únete a nosotros para mejorar y expandir este proyecto! Si estás interesado en contribuir, sigue estos pasos:
+
+bash
+### Forkea el repositorio.
+git clone https://github.com/tu-usuario/Dashboard-Next.js.git
+cd Dashboard-Next.js
+git checkout -b tu-nueva-funcionalidad
+
+### Realiza tus cambios y haz commits descriptivos.
+git add .
+git commit -m "Añade nueva funcionalidad"
+
+### Sube tus cambios a tu repositorio.
+git push origin tu-nueva-funcionalidad
+
+### Crea un Pull Request explicando tus modificaciones.
+¡Esperamos ansiosos tus contribuciones para hacer de este Dashboard una herramienta aún más poderosa y versátil! 🤝✨
