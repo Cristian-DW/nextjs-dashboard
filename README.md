@@ -1,15 +1,9 @@
-# Dashboard con Next.js 🚀📊
+# Dashboard con Next.js 
 
 ## Descripción
 
 ¡Bienvenido al Dashboard impulsado por Next.js, una plataforma potente para visualización de datos y análisis! Este proyecto ofrece una interfaz elegante y eficiente para controlar y analizar tus datos de manera intuitiva.
 
-## Características Principales
-
-- **Desarrollo Rápido:** Utiliza Next.js para un desarrollo ágil y eficiente, permitiendo la creación de componentes dinámicos con TypeScript.
-- **Semilla de Datos:** Inicia tu aplicación con datos significativos utilizando el comando `npm run seed` para un inicio más rápido y realista.
-- **Compilación Eficiente:** Optimiza tu código con el comando `npm run build`, asegurando una ejecución suave y eficaz en entornos de producción.
-- **Interfaz Responsiva:** Disfruta de una experiencia de usuario consistente en todos los dispositivos gracias a un diseño responsivo y amigable.
 
 ## Requisitos Previos
 
