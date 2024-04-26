@@ -56,21 +56,5 @@ Este comando ejecuta la aplicacion en entorno de producción.
 ¡Únete a este proyecto para mejorarlo y expandirlo! Si estás interesado en contribuir, sigue estos pasos:
 
 
-### Forkea el repositorio.
-```bash
-git clone https://github.com/tu-usuario/Dashboard-Next.js.git
-cd Dashboard-Next.js
-git checkout -b tu-nueva-funcionalidad
-```
-### Realiza tus cambios y haz commits descriptivos.
-```bash
-git add .
-git commit -m "Añade nueva funcionalidad"
-```
-### Sube tus cambios a tu repositorio.
-```bash
-git push origin tu-nueva-funcionalidad
-```
-
 ### Crea un Pull Request explicando tus modificaciones.
 ¡Espero ansioso tus contribuciones para hacer de este Dashboard una herramienta aún más poderosa y versátil! 🤝✨
