@@ -49,12 +49,3 @@ npm run start
 ```
 
 Este comando ejecuta la aplicacion en entorno de producción.
-
-
-
-## Colaboración
-¡Únete a este proyecto para mejorarlo y expandirlo! Si estás interesado en contribuir, sigue estos pasos:
-
-
-### Crea un Pull Request explicando tus modificaciones.
-¡Espero ansioso tus contribuciones para hacer de este Dashboard una herramienta aún más poderosa y versátil! 🤝✨
