@@ -1,13 +1,8 @@
-import { Roboto, Audiowide } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 
-export const roboto = Roboto({
+export const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+export const playfair = Playfair_Display({
   subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-roboto',
-});
-
-export const audiowide = Audiowide({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-audiowide',
+  weight: ['400', '700'],
+  variable: '--font-playfair',
 });
