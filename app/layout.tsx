@@ -1,5 +1,14 @@
-import { audiowide, roboto } from './ui/fonts';
+import { inter, playfair } from './ui/fonts';
 import './ui/global.css';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Deltux Invoicing',
+    default: 'Deltux Invoicing Platform',
+  },
+  description: 'The premium invoicing platform for modern businesses.',
+};
 
 export default function RootLayout({
   children,
@@ -8,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${roboto.className} antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${playfair.variable} antialiased`}>{children}</body>
     </html>
   );
 }

@@ -8,14 +8,29 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-inter)'],
+        serif: ['var(--font-playfair)'],
+      },
       gridTemplateColumns: {
         '13': 'repeat(13, minmax(0, 1fr))',
       },
       colors: {
-        blue: {
-          400: '#2589FE',
-          500: '#0070F3',
-          600: '#2F6FEB',
+        primary: {
+          400: '#38BDF8', // Sky 400
+          500: '#0EA5E9', // Sky 500
+          600: '#0284C7', // Sky 600
+          900: '#0C4A6E', // Sky 900
+        },
+        slate: {
+          50: '#F8FAFC',
+          100: '#F1F5F9',
+          800: '#1E293B',
+          900: '#0F172A',
+        },
+        gold: {
+          400: '#FACC15',
+          500: '#EAB308',
         },
       },
     },
