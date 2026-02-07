@@ -57,7 +57,8 @@ async function seedInvoices(client) {
     customer_id UUID NOT NULL,
     amount INT NOT NULL,
     status VARCHAR(255) NOT NULL,
-    date DATE NOT NULL
+    date DATE NOT NULL,
+    due_date DATE
   );
 `;
 
@@ -96,7 +97,9 @@ async function seedCustomers(client) {
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,
-        image_url VARCHAR(255) NOT NULL
+        image_url VARCHAR(255) NOT NULL,
+        address TEXT,
+        vat_id VARCHAR(50)
       );
     `;
 
@@ -160,12 +163,56 @@ async function seedRevenue(client) {
   }
 }
 
+async function seedInvoiceItems(client) {
+  try {
+    const createTable = await client.sql`
+      CREATE TABLE IF NOT EXISTS invoice_items (
+        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        invoice_id UUID NOT NULL,
+        description VARCHAR(255) NOT NULL,
+        quantity INT NOT NULL,
+        unit_price INT NOT NULL,
+        amount INT NOT NULL
+      );
+    `;
+    console.log(`Created "invoice_items" table`);
+    return { createTable };
+  } catch (error) {
+    console.error('Error seeding invoice items:', error);
+    throw error;
+  }
+}
+
+async function seedDocuments(client) {
+  try {
+    const createTable = await client.sql`
+      CREATE TABLE IF NOT EXISTS documents (
+        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        url TEXT NOT NULL,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        linked_to_type VARCHAR(50),
+        linked_to_id UUID
+      );
+    `;
+    console.log(`Created "documents" table`);
+    return { createTable };
+  } catch (error) {
+    console.error('Error seeding documents:', error);
+    throw error;
+  }
+}
+
 async function main() {
   const client = await db.connect();
 
   await seedUsers(client);
   await seedCustomers(client);
+  await seedUsers(client);
+  await seedCustomers(client);
   await seedInvoices(client);
+  await seedInvoiceItems(client);
+  await seedDocuments(client);
   await seedRevenue(client);
 
   await client.end();
