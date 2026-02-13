@@ -9,7 +9,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
   const { replace } = useRouter();
 
   const handleSearch = (term: string) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     if (term) {
       params.set('query', term);
     } else {
@@ -26,7 +26,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
       </label>
       <input
         onChange={(evento) => handleSearch(evento.target.value)}
-        className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+        className="peer block w-full rounded-md border border-slate-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-slate-500 focus:border-primary-500 focus:ring-primary-500"
         placeholder={placeholder}
         defaultValue={searchParams.get('query')?.toString()}
       />
