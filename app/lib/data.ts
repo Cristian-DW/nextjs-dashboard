@@ -100,8 +100,62 @@ export async function fetchFilteredInvoices(
         customers.name ILIKE ${`%${query}%`} OR
         customers.email ILIKE ${`%${query}%`} OR
         invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
+        TO_CHAR(invoices.date, 'Mon DD, YYYY') ILIKE ${`%${query}%`} OR
         invoices.status ILIKE ${`%${query}%`}
+      ORDER BY invoices.date DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch invoices.');
+  }
+}
+
+// New function for advanced filtering with status and date range
+export async function fetchFilteredInvoicesAdvanced(
+  query: string,
+  currentPage: number,
+  status?: 'pending' | 'paid' | 'all',
+  dateFrom?: string,
+  dateTo?: string,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    let statusFilter = sql`TRUE`;
+    if (status && status !== 'all') {
+      statusFilter = sql`invoices.status = ${status}`;
+    }
+
+    let dateFilter = sql`TRUE`;
+    if (dateFrom && dateTo) {
+      dateFilter = sql`invoices.date BETWEEN ${dateFrom} AND ${dateTo}`;
+    } else if (dateFrom) {
+      dateFilter = sql`invoices.date >= ${dateFrom}`;
+    } else if (dateTo) {
+      dateFilter = sql`invoices.date <= ${dateTo}`;
+    }
+
+    const invoices = await sql<InvoicesTable>`
+      SELECT
+        invoices.id,
+        invoices.amount,
+        invoices.date,
+        invoices.status,
+        customers.name,
+        customers.email,
+        customers.image_url
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      WHERE
+        (customers.name ILIKE ${`%${query}%`} OR
+        customers.email ILIKE ${`%${query}%`} OR
+        invoices.amount::text ILIKE ${`%${query}%`} OR
+        TO_CHAR(invoices.date, 'Mon DD, YYYY') ILIKE ${`%${query}%`})
+        AND ${statusFilter}
+        AND ${dateFilter}
       ORDER BY invoices.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
@@ -122,7 +176,7 @@ export async function fetchInvoicesPages(query: string) {
       customers.name ILIKE ${`%${query}%`} OR
       customers.email ILIKE ${`%${query}%`} OR
       invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
+      TO_CHAR(invoices.date, 'Mon DD, YYYY') ILIKE ${`%${query}%`} OR
       invoices.status ILIKE ${`%${query}%`}
   `;
 
