@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from './db';
 import {
   CustomerField,
   CustomersTable,
@@ -124,19 +124,7 @@ export async function fetchFilteredInvoicesAdvanced(
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    let statusFilter = sql`TRUE`;
-    if (status && status !== 'all') {
-      statusFilter = sql`invoices.status = ${status}`;
-    }
-
-    let dateFilter = sql`TRUE`;
-    if (dateFrom && dateTo) {
-      dateFilter = sql`invoices.date BETWEEN ${dateFrom} AND ${dateTo}`;
-    } else if (dateFrom) {
-      dateFilter = sql`invoices.date >= ${dateFrom}`;
-    } else if (dateTo) {
-      dateFilter = sql`invoices.date <= ${dateTo}`;
-    }
+    // Filters are applied inline in the SQL query parameters
 
     const invoices = await sql<InvoicesTable>`
       SELECT
@@ -154,8 +142,9 @@ export async function fetchFilteredInvoicesAdvanced(
         customers.email ILIKE ${`%${query}%`} OR
         invoices.amount::text ILIKE ${`%${query}%`} OR
         TO_CHAR(invoices.date, 'Mon DD, YYYY') ILIKE ${`%${query}%`})
-        AND ${statusFilter}
-        AND ${dateFilter}
+        AND (${status === 'all' || !status ? 'true' : 'false'} = 'true' OR invoices.status = ${status || ''})
+        AND (${!dateFrom ? 'true' : 'false'} = 'true' OR invoices.date >= ${dateFrom || '1970-01-01'}::date)
+        AND (${!dateTo ? 'true' : 'false'} = 'true' OR invoices.date <= ${dateTo || '2100-01-01'}::date)
       ORDER BY invoices.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
