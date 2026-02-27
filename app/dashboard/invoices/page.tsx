@@ -11,12 +11,12 @@ export default async function Page({
   searchParams,
 }: {
   searchParams?: {
-    query: string;
-    currentPage: number;
+    query?: string;
+    page?: string;
   };
 }) {
   const query = searchParams?.query || '';
-  const currentPage = searchParams?.currentPage || 1;
+  const currentPage = Number(searchParams?.page) || 1;
   const totalPages = await fetchInvoicesPages(query);
   return (
     <div className="w-full">
