@@ -21,13 +21,13 @@ export default async function Page({
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between mb-8">
-        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>Invoices</h1>
+        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>Sales History</h1>
         <div className="text-sm text-slate-500 font-medium bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
           {totalPages} {totalPages === 1 ? 'page' : 'pages'}
         </div>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search placeholder="Search invoices..." />
+        <Search placeholder="Search sales..." />
         <CreateInvoice />
       </div>
       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>

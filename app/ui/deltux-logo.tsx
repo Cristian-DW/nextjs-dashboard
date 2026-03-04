@@ -1,4 +1,4 @@
-import { CubeTransparentIcon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { playfair } from '@/app/ui/fonts';
 
 export default function DeltuxLogo() {
@@ -6,8 +6,8 @@ export default function DeltuxLogo() {
         <div
             className={`${playfair.className} flex flex-row items-center leading-none text-white`}
         >
-            <CubeTransparentIcon className="h-12 w-12 rotate-[15deg]" />
-            <p className="text-[44px] ml-4 font-bold tracking-tighter">Deltux</p>
+            <ShoppingCartIcon className="h-12 w-12" />
+            <p className="text-[36px] ml-4 font-bold tracking-tighter">Deltux POS</p>
         </div>
     );
 }
