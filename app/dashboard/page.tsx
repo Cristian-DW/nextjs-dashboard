@@ -1,47 +1,179 @@
-import { Suspense } from 'react';
-import { fetchCardData, fetchLatestInvoices, fetchRevenue } from '../lib/data';
+import { fetchAnalyticsSummary, fetchTopProducts, fetchDailyRevenue, fetchHourlySales } from '@/app/lib/data';
+import { playfair, inter } from '@/app/ui/fonts';
+import { formatCurrency } from '@/app/lib/utils';
+import Link from 'next/link';
+import {
+  BanknotesIcon, ShoppingCartIcon, CubeIcon, ExclamationTriangleIcon, ArrowTrendingUpIcon,
+} from '@heroicons/react/24/outline';
+import clsx from 'clsx';
 
-import { Card } from '@/app/ui/dashboard/cards';
-import RevenueChart from '@/app/ui/dashboard/revenue-chart';
-import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
-import { inter, playfair } from '@/app/ui/fonts';
-import { LatestInvoicesSkeleton, RevenueChartSkeleton } from '../ui/skeletons';
+export default async function DashboardPage() {
+  const [summary, topProducts, dailyRevenue, hourlySales] = await Promise.all([
+    fetchAnalyticsSummary(),
+    fetchTopProducts(5),
+    fetchDailyRevenue(14),
+    fetchHourlySales(),
+  ]);
 
-export default async function Page() {
-  const latestInvoices = await fetchLatestInvoices();
-  const {
-    numberOfInvoices,
-    numberOfCustomers,
-    totalPaidInvoices,
-    totalPendingInvoices,
-  } = await fetchCardData();
+  const maxRevenue = Math.max(...dailyRevenue.map((d) => Number(d.revenue)), 1);
+  const maxHourly = Math.max(...hourlySales.map((h) => h.sale_count), 1);
+  const maxTopRevenue = Math.max(...topProducts.map((p) => Number(p.total_revenue)), 1);
+
+  const kpis = [
+    { label: 'Total Revenue', value: formatCurrency(summary.totalRevenue), icon: BanknotesIcon, color: 'indigo', sub: 'All completed sales' },
+    { label: 'Total Sales', value: summary.totalSales.toLocaleString(), icon: ShoppingCartIcon, color: 'emerald', sub: 'Completed transactions' },
+    { label: 'Avg. Order Value', value: formatCurrency(summary.avgOrderValue), icon: ArrowTrendingUpIcon, color: 'violet', sub: 'Per transaction' },
+    { label: 'Items Sold', value: summary.totalItemsSold.toLocaleString(), icon: CubeIcon, color: 'amber', sub: 'Total units sold' },
+  ];
+
   return (
-    <main className="w-full">
-      <div className="flex w-full items-center justify-between mb-8">
-        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>
-          Dashboard
-        </h1>
-        <div className="text-sm text-slate-500 font-medium bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
-          Overview
+    <main className="w-full space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Welcome back &mdash; here&apos;s your store overview</p>
+        </div>
+        <Link href="/dashboard/pos"
+          className="flex items-center gap-2 h-10 px-4 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/20">
+          <ShoppingCartIcon className="w-4 h-4" />
+          <span className="hidden sm:inline">Open Terminal</span>
+        </Link>
+      </div>
+
+      {/* Low stock alert */}
+      {summary.lowStockCount > 0 && (
+        <Link href="/dashboard/inventory" className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 hover:bg-amber-100 transition-colors">
+          <ExclamationTriangleIcon className="w-5 h-5 text-amber-500 shrink-0" />
+          <p className="text-sm text-amber-700 font-medium">
+            <span className="font-bold">{summary.lowStockCount} product{summary.lowStockCount !== 1 ? 's' : ''}</span> {summary.lowStockCount === 1 ? 'is' : 'are'} running low on stock.
+            <span className="underline ml-1">Manage inventory →</span>
+          </p>
+        </Link>
+      )}
+
+      {/* KPI cards */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {kpis.map((kpi) => {
+          const Icon = kpi.icon;
+          const colorMap: Record<string, string> = {
+            indigo: 'bg-indigo-50 text-indigo-500 ring-indigo-100',
+            emerald: 'bg-emerald-50 text-emerald-500 ring-emerald-100',
+            violet: 'bg-violet-50 text-violet-500 ring-violet-100',
+            amber: 'bg-amber-50 text-amber-500 ring-amber-100',
+          };
+          return (
+            <div key={kpi.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+              <div className={clsx('w-10 h-10 rounded-xl flex items-center justify-center ring-4 mb-4', colorMap[kpi.color])}>
+                <Icon className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{kpi.label}</p>
+              <p className={`${inter.className} text-2xl font-extrabold text-slate-900 mt-1`}>{kpi.value}</p>
+              <p className="text-xs text-slate-400 mt-1">{kpi.sub}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Revenue chart + Top Products */}
+      <div className="grid lg:grid-cols-3 gap-4">
+        {/* Revenue chart */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <h2 className="text-sm font-bold text-slate-800 mb-5">Revenue — Last 14 Days</h2>
+          {dailyRevenue.length === 0 ? (
+            <div className="h-48 flex items-center justify-center text-slate-300 text-sm">No sales data yet</div>
+          ) : (
+            <div className="flex items-end gap-1.5 h-48">
+              {dailyRevenue.map((d) => {
+                const h = Math.max(4, (Number(d.revenue) / maxRevenue) * 100);
+                return (
+                  <div key={d.day} className="flex-1 flex flex-col items-center gap-1 group relative">
+                    <div
+                      className="w-full rounded-t-lg bg-indigo-500 group-hover:bg-indigo-600 transition-all cursor-default"
+                      style={{ height: `${h}%` }}
+                    />
+                    <span className="text-[9px] text-slate-400 rotate-45 origin-left hidden sm:block">{d.day}</span>
+                    {/* Tooltip */}
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                      {formatCurrency(Number(d.revenue))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Top products */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <h2 className="text-sm font-bold text-slate-800 mb-5">Top Products</h2>
+          {topProducts.length === 0 ? (
+            <div className="text-center text-slate-300 text-sm py-10">No data yet</div>
+          ) : (
+            <div className="space-y-4">
+              {topProducts.map((p, i) => (
+                <div key={p.product_name}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-300 w-4">#{i + 1}</span>
+                      <span className="text-sm font-semibold text-slate-700 truncate max-w-[120px]">{p.product_name}</span>
+                    </div>
+                    <span className="text-xs text-slate-500 font-medium shrink-0">{p.total_quantity} sold</span>
+                  </div>
+                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-indigo-400 rounded-full transition-all"
+                      style={{ width: `${(Number(p.total_revenue) / maxTopRevenue) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Card title="Total Sales" value={totalPaidInvoices} type="collected" />
-        <Card title="Pending Orders" value={totalPendingInvoices} type="pending" />
-        <Card title="Total Transactions" value={numberOfInvoices} type="invoices" />
-        <Card
-          title="Total Customers"
-          value={numberOfCustomers}
-          type="customers"
-        />
+
+      {/* Hourly heatmap */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <h2 className="text-sm font-bold text-slate-800 mb-5">Sales Heatmap — By Hour (Last 30 Days)</h2>
+        <div className="flex items-end gap-1">
+          {Array.from({ length: 24 }, (_, hour) => {
+            const data = hourlySales.find((h) => h.hour === hour);
+            const count = data?.sale_count || 0;
+            const intensity = maxHourly > 0 ? count / maxHourly : 0;
+            const bg = intensity === 0 ? 'bg-slate-100' :
+              intensity < 0.25 ? 'bg-indigo-100' :
+                intensity < 0.5 ? 'bg-indigo-300' :
+                  intensity < 0.75 ? 'bg-indigo-500' : 'bg-indigo-700';
+            return (
+              <div key={hour} className="flex-1 flex flex-col items-center gap-1 group relative">
+                <div className={clsx('w-full rounded-md transition-all cursor-default', bg)} style={{ height: '36px' }} />
+                <span className="text-[9px] text-slate-400">{hour}h</span>
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10">
+                  {count} sale{count !== 1 ? 's' : ''} at {hour}:00
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-        <Suspense fallback={<RevenueChartSkeleton />}>
-          <RevenueChart />
-        </Suspense>
-        <Suspense fallback={<LatestInvoicesSkeleton />}>
-          <LatestInvoices latestInvoices={latestInvoices} />
-        </Suspense>
+
+      {/* Quick links */}
+      <div className="grid sm:grid-cols-3 gap-4">
+        {[
+          { label: 'POS Terminal', href: '/dashboard/pos', emoji: '🖥️', desc: 'Start a new sale' },
+          { label: 'Add Product', href: '/dashboard/products/create', emoji: '📦', desc: 'Add to catalog' },
+          { label: 'Inventory', href: '/dashboard/inventory', emoji: '📊', desc: 'Check stock levels' },
+        ].map((item) => (
+          <Link key={item.href} href={item.href}
+            className="flex items-center gap-4 bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-md hover:border-indigo-200 transition-all group">
+            <span className="text-3xl">{item.emoji}</span>
+            <div>
+              <p className="font-semibold text-slate-800 text-sm group-hover:text-indigo-600 transition-colors">{item.label}</p>
+              <p className="text-xs text-slate-400">{item.desc}</p>
+            </div>
+          </Link>
+        ))}
       </div>
     </main>
   );
