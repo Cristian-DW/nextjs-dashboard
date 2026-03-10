@@ -3,19 +3,21 @@ import Link from 'next/link';
 import clsx from 'clsx';
 
 import {
-  UserGroupIcon,
   HomeIcon,
-  DocumentDuplicateIcon,
+  ShoppingCartIcon,
+  ArchiveBoxIcon,
+  CubeIcon,
+  UserGroupIcon,
+  ChartBarIcon,
 } from '@heroicons/react/24/outline';
 import { usePathname } from 'next/navigation';
 
 const links = [
-  { name: 'Home', href: '/dashboard', icon: HomeIcon },
-  {
-    name: 'Invoices',
-    href: '/dashboard/invoices',
-    icon: DocumentDuplicateIcon,
-  },
+  { name: 'Dashboard', href: '/dashboard', icon: ChartBarIcon },
+  { name: 'POS Terminal', href: '/dashboard/pos', icon: ShoppingCartIcon },
+  { name: 'Sales History', href: '/dashboard/invoices', icon: HomeIcon },
+  { name: 'Products', href: '/dashboard/products', icon: CubeIcon },
+  { name: 'Inventory', href: '/dashboard/inventory', icon: ArchiveBoxIcon },
   { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
 ];
 
@@ -30,13 +32,13 @@ export default function NavLinks() {
             key={link.name}
             href={link.href}
             className={clsx(
-              'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-transparent p-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white md:flex-none md:justify-start md:p-2 md:px-3',
+              'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-transparent p-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white md:flex-none md:justify-start md:p-2 md:px-3 transition-colors',
               {
                 'bg-slate-800 text-white shadow-md shadow-slate-900/20': pathname === link.href,
               },
             )}
           >
-            <LinkIcon className="w-6" />
+            <LinkIcon className="w-5 shrink-0" />
             <p className="hidden md:block">{link.name}</p>
           </Link>
         );
