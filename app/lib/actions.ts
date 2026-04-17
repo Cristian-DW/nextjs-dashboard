@@ -4,13 +4,18 @@ import { z } from 'zod';
 import { sql } from './db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { CartItem } from './definitions';
 
 // ─────────────────────────────────────────
-// AUTH
+// AUTH & LOCALE
 // ─────────────────────────────────────────
+
+export async function setLocaleCookie(locale: string) {
+  cookies().set('deltux_pos_locale', locale, { path: '/' });
+}
 
 export async function authenticate(
   prevState: string | undefined,
