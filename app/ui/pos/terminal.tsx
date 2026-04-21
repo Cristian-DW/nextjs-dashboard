@@ -11,6 +11,7 @@ import {
   PencilSquareIcon, CalculatorIcon, ArrowRightIcon, ClockIcon,
 } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/app/lib/utils';
+import { useT } from '@/app/lib/i18n/context';
 import clsx from 'clsx';
 
 type PaymentMethod = 'cash' | 'card' | 'transfer' | 'split';
@@ -33,6 +34,7 @@ type SplitPayment = { cash: string; card: string };
 
 // ─── NUMPAD ──────────────────────────────────────────────────────────────────
 function NumPad({ value, onChange, onClose }: { value: string; onChange: (v: string) => void; onClose: () => void }) {
+  const t = useT();
   const press = (k: string) => {
     if (k === 'DEL') { onChange(value.slice(0, -1)); return; }
     if (k === 'CLR') { onChange(''); return; }
@@ -57,8 +59,8 @@ function NumPad({ value, onChange, onClose }: { value: string; onChange: (v: str
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2 mt-2">
-        <button onClick={() => press('CLR')} className="h-10 rounded-xl bg-amber-50 text-amber-600 font-bold text-xs hover:bg-amber-100 transition-all">Clear</button>
-        <button onClick={onClose} className="h-10 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 transition-all">Done</button>
+        <button onClick={() => press('CLR')} className="h-10 rounded-xl bg-amber-50 text-amber-600 font-bold text-xs hover:bg-amber-100 transition-all">{t.pos.numPadClear}</button>
+        <button onClick={onClose} className="h-10 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 transition-all">{t.pos.numPadDone}</button>
       </div>
     </div>
   );
@@ -66,6 +68,7 @@ function NumPad({ value, onChange, onClose }: { value: string; onChange: (v: str
 
 // ─── CUSTOM ITEM MODAL ────────────────────────────────────────────────────────
 function CustomItemModal({ onAdd, onClose }: { onAdd: (item: CartItem) => void; onClose: () => void }) {
+  const t = useT();
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [qty, setQty] = useState('1');
@@ -80,33 +83,33 @@ function CustomItemModal({ onAdd, onClose }: { onAdd: (item: CartItem) => void; 
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-bold text-slate-900">Custom Item</h3>
+          <h3 className="font-bold text-slate-900">{t.pos.customItem}</h3>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><XMarkIcon className="w-5 h-5" /></button>
         </div>
         <div className="space-y-3">
           <div>
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Item Name *</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Service fee"
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.pos.customItemName} {t.common.required}</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t.pos.customItemNamePlaceholder}
               className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Price ($) *</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.pos.customItemPrice} {t.common.required}</label>
               <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" min="0" step="0.01" placeholder="0.00"
                 className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
             </div>
             <div>
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Qty</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.pos.customItemQty}</label>
               <input value={qty} onChange={(e) => setQty(e.target.value)} type="number" min="1"
                 className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
             </div>
           </div>
         </div>
         <div className="flex gap-3 mt-5">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50">{t.common.cancel}</button>
           <button onClick={handleAdd} disabled={!name || !price}
             className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-md shadow-indigo-500/20">
-            Add to Cart
+            {t.pos.addToCart}
           </button>
         </div>
       </div>
@@ -117,6 +120,7 @@ function CustomItemModal({ onAdd, onClose }: { onAdd: (item: CartItem) => void; 
 // ─── MAIN TERMINAL ────────────────────────────────────────────────────────────
 export default function POSTerminal({ initialProducts, categories, defaultTaxRate = 0 }: TerminalProps) {
   const router = useRouter();
+  const t = useT();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -284,7 +288,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
           <div className="relative flex-1">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input ref={searchRef} value={search} onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search products… (press /)"
+              placeholder={t.pos.searchPlaceholder}
               className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
           <button onClick={() => setShowCustomItem(true)} title="Add custom item"
@@ -302,11 +306,11 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
             {showHeld && (
               <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 z-30 overflow-hidden">
                 <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                  <span className="text-sm font-bold text-slate-800">Held Sales</span>
+                  <span className="text-sm font-bold text-slate-800">{t.pos.heldSales}</span>
                   <button onClick={() => setShowHeld(false)}><XMarkIcon className="w-4 h-4 text-slate-400" /></button>
                 </div>
                 {heldSales.length === 0 ? (
-                  <div className="py-8 text-center text-slate-400 text-sm">No held sales</div>
+                  <div className="py-8 text-center text-slate-400 text-sm">{t.pos.noHeldSales}</div>
                 ) : (
                   <div className="divide-y divide-slate-50">
                     {heldSales.map((h) => (
@@ -327,7 +331,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
         <div className="flex gap-2 overflow-x-auto pb-2 mb-3 scrollbar-none shrink-0">
           <button onClick={() => setActiveCategory(null)}
             className={clsx('shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold border transition-all', !activeCategory ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-400')}>
-            All
+            {t.pos.allCategories}
           </button>
           {categories.map((cat) => (
             <button key={cat.id} onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
@@ -343,8 +347,8 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
           {filteredProducts.length === 0 && (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
               <ExclamationTriangleIcon className="w-10 h-10 mb-2" />
-              <p className="text-sm">No products found</p>
-              <button onClick={() => setShowCustomItem(true)} className="mt-2 text-xs text-indigo-500 hover:underline">+ Add custom item</button>
+              <p className="text-sm">{t.pos.noProductsFound}</p>
+              <button onClick={() => setShowCustomItem(true)} className="mt-2 text-xs text-indigo-500 hover:underline">{t.pos.addCustomItem}</button>
             </div>
           )}
           {filteredProducts.map((product) => {
@@ -371,7 +375,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-bold text-indigo-600">{formatCurrency(product.price)}</p>
                   <span className={clsx('text-[10px]', product.stock <= product.low_stock_threshold && product.stock > 0 ? 'text-amber-500 font-medium' : 'text-slate-300')}>
-                    {outOfStock ? '⚠ Out' : product.stock <= product.low_stock_threshold ? `${product.stock} left` : ''}
+                    {outOfStock ? t.pos.outOfStock : product.stock <= product.low_stock_threshold ? `${product.stock} ${t.pos.lowStock}` : ''}
                   </span>
                 </div>
               </button>
@@ -387,7 +391,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-2">
             <ShoppingCartIcon className="w-5 h-5 text-indigo-600" />
-            <span className="font-bold text-slate-800 text-sm">Cart</span>
+            <span className="font-bold text-slate-800 text-sm">{t.pos.cart}</span>
             {cart.length > 0 && (
               <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">
                 {cart.reduce((s, i) => s + i.quantity, 0)}
@@ -413,7 +417,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
         <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-50 shrink-0">
           <UserIcon className="w-3.5 h-3.5 text-slate-300 shrink-0" />
           <input value={customerName} onChange={(e) => setCustomerName(e.target.value)}
-            placeholder="Customer name (optional)"
+            placeholder={t.pos.customerPlaceholder}
             className="flex-1 text-xs text-slate-600 placeholder-slate-300 bg-transparent focus:outline-none" />
         </div>
 
@@ -422,8 +426,8 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
           {cart.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full py-12 text-slate-300">
               <ShoppingCartIcon className="w-10 h-10 mb-2" />
-              <p className="text-sm text-slate-400">Cart is empty</p>
-              <p className="text-xs mt-1">Click products to add them</p>
+              <p className="text-sm text-slate-400">{t.pos.cartEmpty}</p>
+              <p className="text-xs mt-1">{t.pos.cartEmptySub}</p>
             </div>
           )}
           {cart.map((item) => (
@@ -467,7 +471,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
                 <div className="flex items-center gap-1.5">
                   <TagIcon className="w-3.5 h-3.5 text-emerald-600" />
                   <span className="text-xs font-bold text-emerald-700">{appliedDiscount.code}</span>
-                  <span className="text-xs text-emerald-600">— {appliedDiscount.label}</span>
+                  <span className="text-xs text-emerald-600">— {appliedDiscount.label} ({t.pos.couponApplied})</span>
                 </div>
                 <button onClick={() => setAppliedDiscount(null)} className="text-emerald-400 hover:text-emerald-600">
                   <XMarkIcon className="w-3.5 h-3.5" />
@@ -480,12 +484,12 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
                     <TagIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                     <input value={discountCode} onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
                       onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
-                      placeholder="Coupon code"
+                      placeholder={t.pos.couponPlaceholder}
                       className="w-full pl-8 pr-2 py-1.5 text-xs font-mono font-bold uppercase rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-400 tracking-wider" />
                   </div>
                   <button onClick={applyCoupon} disabled={couponLoading || !discountCode}
                     className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 disabled:opacity-40 shrink-0 transition-colors">
-                    {couponLoading ? '…' : 'Apply'}
+                    {couponLoading ? '…' : t.pos.applyCoupon}
                   </button>
                 </div>
                 {couponError && <p className="text-xs text-red-500 mt-0.5">{couponError}</p>}
@@ -493,7 +497,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
             )}
             {/* Tax */}
             <div className="flex items-center gap-2">
-              <label className="text-xs text-slate-500 w-20 shrink-0">Tax %</label>
+              <label className="text-xs text-slate-500 w-20 shrink-0">{t.pos.taxLabel}</label>
               <input type="number" min="0" max="100" step="0.1" value={taxRate} onChange={(e) => setTaxRate(Number(e.target.value))}
                 className="flex-1 text-right text-sm font-semibold rounded-lg border border-slate-200 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
             </div>
@@ -503,18 +507,18 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
         {/* Totals */}
         <div className="px-4 py-3 bg-gradient-to-b from-slate-50 to-white border-t border-slate-100 space-y-1 text-xs text-slate-500 shrink-0">
           <div className="flex justify-between">
-            <span>Subtotal</span>
+            <span>{t.pos.subtotal}</span>
             <span className="font-medium text-slate-600">{formatCurrency(subtotal)}</span>
           </div>
           {discountAmt > 0 && (
             <div className="flex justify-between text-emerald-600">
-              <span>Discount {appliedDiscount?.code ? `(${appliedDiscount.code})` : ''}</span>
+              <span>{t.pos.discount} {appliedDiscount?.code ? `(${appliedDiscount.code})` : ''}</span>
               <span>-{formatCurrency(discountAmt)}</span>
             </div>
           )}
-          {taxAmt > 0 && <div className="flex justify-between"><span>Tax ({taxRate}%)</span><span>{formatCurrency(taxAmt)}</span></div>}
+          {taxAmt > 0 && <div className="flex justify-between"><span>{t.pos.tax} ({taxRate}%)</span><span>{formatCurrency(taxAmt)}</span></div>}
           <div className="flex justify-between text-base font-extrabold text-slate-900 pt-1.5 border-t border-slate-200">
-            <span>Total</span><span>{formatCurrency(total)}</span>
+            <span>{t.pos.total}</span><span>{formatCurrency(total)}</span>
           </div>
         </div>
 
@@ -522,10 +526,10 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
         <div className="p-3 shrink-0">
           <button disabled={cart.length === 0} onClick={() => setShowCheckout(true)}
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 hover:from-indigo-700 hover:to-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2">
-            <span>Charge {formatCurrency(total)}</span>
+            <span>{t.pos.charge} {formatCurrency(total)}</span>
             <ArrowRightIcon className="w-4 h-4" />
           </button>
-          <p className="text-center text-[10px] text-slate-300 mt-1.5">⌘↩ checkout · / search · ⌘H hold</p>
+          <p className="text-center text-[10px] text-slate-300 mt-1.5">{t.pos.checkoutShortcuts}</p>
         </div>
       </div>
 
@@ -535,7 +539,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Complete Sale</h2>
+                <h2 className="text-lg font-bold text-slate-900">{t.pos.completeSale}</h2>
                 {customerName && <p className="text-xs text-slate-400">{customerName}</p>}
               </div>
               <button onClick={() => setShowCheckout(false)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
@@ -569,9 +573,10 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
 
               {/* Payment method */}
               <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Payment Method</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t.pos.paymentMethod}</p>
                 <div className="grid grid-cols-4 gap-2">
-                  {([['cash', '💵', 'Cash'], ['card', '💳', 'Card'], ['transfer', '🏦', 'Transfer'], ['split', '⚡', 'Split']] as const).map(([method, emoji, label]) => (
+                  {([['cash', '💵', t.pos.cash], ['card', '💳', t.pos.card], ['transfer', '🏦', t.pos.transfer], ['split', '⚡', t.pos.split]] as [string, string, string][]).map(([method, emoji, label]) => (
+                    // @ts-ignore
                     <button key={method} onClick={() => setPaymentMethod(method)}
                       className={clsx('py-3 rounded-xl border-2 text-xs font-bold flex flex-col items-center gap-1 transition-all', {
                         'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md shadow-indigo-100': paymentMethod === method,
@@ -586,7 +591,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
               {/* Cash tendered */}
               {paymentMethod === 'cash' && (
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cash Tendered</label>
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.pos.cashTendered}</label>
                   <div className="relative mt-1 flex gap-2">
                     <div className="relative flex-1">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">$</span>
@@ -609,7 +614,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
                   </div>
                   {cashTenderedCents > 0 && (
                     <div className={clsx('mt-2 text-center rounded-xl py-2.5 font-bold text-sm', change >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600')}>
-                      Change: {formatCurrency(change)}
+                      {t.pos.change}: {formatCurrency(change)}
                     </div>
                   )}
                 </div>
@@ -618,11 +623,11 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
               {/* Split payment */}
               {paymentMethod === 'split' && (
                 <div className="space-y-3">
-                  <p className="text-xs text-slate-500">Split total of <strong>{formatCurrency(total)}</strong> between cash and card.</p>
+                  <p className="text-xs text-slate-500">{t.pos.splitTotal} <strong>{formatCurrency(total)}</strong>.</p>
                   <div className="grid grid-cols-2 gap-3">
-                    {(['cash', 'card'] as const).map((type) => (
+                    {(['cash', 'card'] as const).map((type: 'cash' | 'card') => (
                       <div key={type}>
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider capitalize">{type == 'cash' ? '💵 Cash' : '💳 Card'}</label>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider capitalize">{type === 'cash' ? t.pos.splitCash : t.pos.splitCard}</label>
                         <div className="relative mt-1 flex gap-1">
                           <div className="relative flex-1">
                             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
@@ -640,7 +645,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
                     ))}
                   </div>
                   <div className={clsx('text-center rounded-xl py-2 text-sm font-bold', splitValid ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-600')}>
-                    {splitValid ? '✓ Payment complete' : `Still needed: ${formatCurrency(total - splitCashCents - splitCardCents)}`}
+                    {splitValid ? t.pos.splitComplete : `${t.pos.splitStillNeeded}: ${formatCurrency(total - splitCashCents - splitCardCents)}`}
                   </div>
                 </div>
               )}
@@ -651,7 +656,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
                 disabled={loading || (paymentMethod === 'cash' && cashTenderedCents > 0 && cashTenderedCents < total) || (paymentMethod === 'split' && !splitValid)}
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-extrabold text-base shadow-lg shadow-emerald-500/30 hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2">
                 {loading ? <ArrowPathIcon className="w-5 h-5 animate-spin" /> : <CheckCircleIcon className="w-5 h-5" />}
-                {loading ? 'Processing…' : 'Confirm Sale'}
+                {loading ? t.pos.processing : t.pos.confirmSale}
               </button>
             </div>
           </div>
@@ -673,6 +678,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
 
 // ─── RECEIPT ─────────────────────────────────────────────────────────────────
 function Receipt({ data, onClose }: { data: ReceiptData; onClose: () => void }) {
+  const t = useT();
   const now = new Date();
   const handlePrint = () => window.print();
   return (
@@ -682,7 +688,7 @@ function Receipt({ data, onClose }: { data: ReceiptData; onClose: () => void }) 
           <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
             <CheckCircleIcon className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-2xl font-extrabold">Sale Complete!</h2>
+          <h2 className="text-2xl font-extrabold">{t.pos.saleComplete}</h2>
           <p className="text-emerald-100 text-sm mt-1 font-mono">#{data.saleId.substring(0, 8).toUpperCase()}</p>
           {data.customerName && <p className="text-white/80 text-xs mt-1">{data.customerName}</p>}
         </div>
@@ -697,32 +703,41 @@ function Receipt({ data, onClose }: { data: ReceiptData; onClose: () => void }) 
             ))}
           </div>
           <div className="border-t border-dashed border-slate-200 pt-3 space-y-1 text-sm">
-            <div className="flex justify-between text-slate-500"><span>Subtotal</span><span>{formatCurrency(data.subtotal)}</span></div>
+            <div className="flex justify-between text-slate-500">
+              <span>{t.pos.subtotal}</span><span>{formatCurrency(data.subtotal)}</span>
+            </div>
             {data.discount > 0 && (
               <div className="flex justify-between text-emerald-600">
-                <span>Discount {data.couponCode ? `(${data.couponCode})` : ''}</span>
+                <span>{t.pos.discount} {data.couponCode ? `(${data.couponCode})` : ''}</span>
                 <span>-{formatCurrency(data.discount)}</span>
               </div>
             )}
-            {data.tax > 0 && <div className="flex justify-between text-slate-500"><span>Tax</span><span>{formatCurrency(data.tax)}</span></div>}
+            {data.tax > 0 && (
+              <div className="flex justify-between text-slate-500">
+                <span>{t.pos.tax}</span><span>{formatCurrency(data.tax)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-extrabold text-xl text-slate-900 pt-2 border-t-2 border-slate-200">
-              <span>Total</span><span>{formatCurrency(data.total)}</span>
+              <span>{t.pos.total}</span><span>{formatCurrency(data.total)}</span>
             </div>
             {data.change > 0 && (
-              <div className="flex justify-between text-indigo-600 font-bold"><span>Change</span><span>{formatCurrency(data.change)}</span></div>
+              <div className="flex justify-between text-indigo-600 font-bold">
+                <span>{t.pos.change}</span><span>{formatCurrency(data.change)}</span>
+              </div>
             )}
           </div>
           <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-400">
-            <span className="capitalize font-medium">{data.paymentMethod}</span> payment
+            <span className="capitalize font-medium">{t.pos.paidBy}</span>
+            <span className="capitalize">{data.paymentMethod}</span>
           </div>
-          <p className="text-center text-xs text-slate-300 mt-2">Thank you for your purchase!</p>
+          <p className="text-center text-xs text-slate-300 mt-2">{t.pos.thankYou}</p>
         </div>
         <div className="px-6 pb-5 flex gap-2">
           <button onClick={handlePrint} className="flex-1 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors">
-            <PrinterIcon className="w-4 h-4" /> Print
+            <PrinterIcon className="w-4 h-4" /> {t.pos.printReceipt}
           </button>
           <button onClick={onClose} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold hover:from-indigo-700 hover:to-violet-700 transition-all">
-            New Sale
+            {t.pos.newSale}
           </button>
         </div>
       </div>
