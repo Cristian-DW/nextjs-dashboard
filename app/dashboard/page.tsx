@@ -2,17 +2,19 @@ import { fetchAnalyticsSummary, fetchTopProducts, fetchDailyRevenue, fetchHourly
 import { playfair, inter } from '@/app/ui/fonts';
 import { formatCurrency } from '@/app/lib/utils';
 import Link from 'next/link';
+import { getTranslations } from '@/app/lib/i18n/server';
 import {
   BanknotesIcon, ShoppingCartIcon, CubeIcon, ExclamationTriangleIcon, ArrowTrendingUpIcon,
 } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 
 export default async function DashboardPage() {
-  const [summary, topProducts, dailyRevenue, hourlySales] = await Promise.all([
+  const [summary, topProducts, dailyRevenue, hourlySales, t] = await Promise.all([
     fetchAnalyticsSummary(),
     fetchTopProducts(5),
     fetchDailyRevenue(14),
     fetchHourlySales(),
+    getTranslations(),
   ]);
 
   const maxRevenue = Math.max(...dailyRevenue.map((d) => Number(d.revenue)), 1);
@@ -20,10 +22,10 @@ export default async function DashboardPage() {
   const maxTopRevenue = Math.max(...topProducts.map((p) => Number(p.total_revenue)), 1);
 
   const kpis = [
-    { label: 'Total Revenue', value: formatCurrency(summary.totalRevenue), icon: BanknotesIcon, color: 'indigo', sub: 'All completed sales' },
-    { label: 'Total Sales', value: summary.totalSales.toLocaleString(), icon: ShoppingCartIcon, color: 'emerald', sub: 'Completed transactions' },
-    { label: 'Avg. Order Value', value: formatCurrency(summary.avgOrderValue), icon: ArrowTrendingUpIcon, color: 'violet', sub: 'Per transaction' },
-    { label: 'Items Sold', value: summary.totalItemsSold.toLocaleString(), icon: CubeIcon, color: 'amber', sub: 'Total units sold' },
+    { label: t.dashboard.totalRevenue, value: formatCurrency(summary.totalRevenue), icon: BanknotesIcon, color: 'indigo', sub: t.dashboard.allCompletedSales },
+    { label: t.dashboard.totalSales, value: summary.totalSales.toLocaleString(), icon: ShoppingCartIcon, color: 'emerald', sub: t.dashboard.completedTransactions },
+    { label: t.dashboard.avgOrder, value: formatCurrency(summary.avgOrderValue), icon: ArrowTrendingUpIcon, color: 'violet', sub: t.dashboard.perTransaction },
+    { label: t.dashboard.itemsSold, value: summary.totalItemsSold.toLocaleString(), icon: CubeIcon, color: 'amber', sub: t.dashboard.totalUnits },
   ];
 
   return (
@@ -31,13 +33,13 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>Dashboard</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Welcome back &mdash; here&apos;s your store overview</p>
+          <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>{t.dashboard.title}</h1>
+          <p className="text-sm text-slate-500 mt-0.5">{t.dashboard.welcome}</p>
         </div>
         <Link href="/dashboard/pos"
           className="flex items-center gap-2 h-10 px-4 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/20">
           <ShoppingCartIcon className="w-4 h-4" />
-          <span className="hidden sm:inline">Open Terminal</span>
+          <span className="hidden sm:inline">{t.dashboard.openTerminal}</span>
         </Link>
       </div>
 
@@ -46,8 +48,8 @@ export default async function DashboardPage() {
         <Link href="/dashboard/inventory" className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 hover:bg-amber-100 transition-colors">
           <ExclamationTriangleIcon className="w-5 h-5 text-amber-500 shrink-0" />
           <p className="text-sm text-amber-700 font-medium">
-            <span className="font-bold">{summary.lowStockCount} product{summary.lowStockCount !== 1 ? 's' : ''}</span> {summary.lowStockCount === 1 ? 'is' : 'are'} running low on stock.
-            <span className="underline ml-1">Manage inventory →</span>
+            <span className="font-bold">{summary.lowStockCount} </span> {t.dashboard.lowStockAlert}
+            <span className="underline ml-1">{t.dashboard.manageInventory}</span>
           </p>
         </Link>
       )}
@@ -79,9 +81,9 @@ export default async function DashboardPage() {
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Revenue chart */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-          <h2 className="text-sm font-bold text-slate-800 mb-5">Revenue — Last 14 Days</h2>
+          <h2 className="text-sm font-bold text-slate-800 mb-5">{t.dashboard.revenueLast14}</h2>
           {dailyRevenue.length === 0 ? (
-            <div className="h-48 flex items-center justify-center text-slate-300 text-sm">No sales data yet</div>
+            <div className="h-48 flex items-center justify-center text-slate-300 text-sm">{t.dashboard.noSalesData}</div>
           ) : (
             <div className="flex items-end gap-1.5 h-48">
               {dailyRevenue.map((d) => {
@@ -106,9 +108,9 @@ export default async function DashboardPage() {
 
         {/* Top products */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-          <h2 className="text-sm font-bold text-slate-800 mb-5">Top Products</h2>
+          <h2 className="text-sm font-bold text-slate-800 mb-5">{t.dashboard.topProducts}</h2>
           {topProducts.length === 0 ? (
-            <div className="text-center text-slate-300 text-sm py-10">No data yet</div>
+            <div className="text-center text-slate-300 text-sm py-10">{t.dashboard.noDataYet}</div>
           ) : (
             <div className="space-y-4">
               {topProducts.map((p, i) => (
@@ -135,7 +137,7 @@ export default async function DashboardPage() {
 
       {/* Hourly heatmap */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-        <h2 className="text-sm font-bold text-slate-800 mb-5">Sales Heatmap — By Hour (Last 30 Days)</h2>
+        <h2 className="text-sm font-bold text-slate-800 mb-5">{t.dashboard.salesHeatmap}</h2>
         <div className="flex items-end gap-1">
           {Array.from({ length: 24 }, (_, hour) => {
             const data = hourlySales.find((h) => h.hour === hour);
@@ -161,9 +163,9 @@ export default async function DashboardPage() {
       {/* Quick links */}
       <div className="grid sm:grid-cols-3 gap-4">
         {[
-          { label: 'POS Terminal', href: '/dashboard/pos', emoji: '🖥️', desc: 'Start a new sale' },
-          { label: 'Add Product', href: '/dashboard/products/create', emoji: '📦', desc: 'Add to catalog' },
-          { label: 'Inventory', href: '/dashboard/inventory', emoji: '📊', desc: 'Check stock levels' },
+          { label: t.dashboard.posTerminal, href: '/dashboard/pos', emoji: '🖥️', desc: t.dashboard.startNewSale },
+          { label: t.dashboard.addProduct, href: '/dashboard/products/create', emoji: '📦', desc: t.dashboard.addToCatalog },
+          { label: t.nav.inventory, href: '/dashboard/inventory', emoji: '📊', desc: t.dashboard.checkStockLevels },
         ].map((item) => (
           <Link key={item.href} href={item.href}
             className="flex items-center gap-4 bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-md hover:border-indigo-200 transition-all group">
