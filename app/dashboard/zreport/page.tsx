@@ -2,6 +2,7 @@ import { sql } from '@/app/lib/db';
 import { playfair } from '@/app/ui/fonts';
 import { formatCurrency } from '@/app/lib/utils';
 import Link from 'next/link';
+import { getTranslations } from '@/app/lib/i18n/server';
 import {
   BanknotesIcon, ShoppingCartIcon, ArrowPathIcon, DocumentArrowDownIcon,
 } from '@heroicons/react/24/outline';
@@ -55,13 +56,14 @@ const PM_ICON: Record<string, string> = { cash: '💵', card: '💳', transfer: 
 
 export default async function ZReportPage() {
   const data = await fetchZReport();
+  const t = await getTranslations();
   const now = new Date();
 
   if (!data || !data.summary) {
     return (
       <div className="max-w-2xl mx-auto text-center py-20">
-        <p className="text-slate-400">No sales data found for today.</p>
-        <Link href="/dashboard" className="mt-4 inline-block text-indigo-500 hover:underline text-sm">← Back to Dashboard</Link>
+        <p className="text-slate-400">{t.zReport.noData}</p>
+        <Link href="/dashboard" className="mt-4 inline-block text-indigo-500 hover:underline text-sm">{t.zReport.backToDashboard}</Link>
       </div>
     );
   }
@@ -75,14 +77,14 @@ export default async function ZReportPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className={`${playfair.className} text-2xl md:text-3xl font-bold text-slate-900`}>
-            End of Day Report
+            {t.zReport.title}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Z-Report · {new Date(data.date + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p className="text-sm text-slate-500 mt-0.5">{t.zReport.subtitle} · {new Date(data.date + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
         <div className="flex gap-2">
           <a href={`/api/export/sales?period=today`}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">
-            <DocumentArrowDownIcon className="w-4 h-4" /> Export CSV
+            <DocumentArrowDownIcon className="w-4 h-4" /> {t.zReport.exportCSV}
           </a>
         </div>
       </div>
@@ -90,18 +92,18 @@ export default async function ZReportPage() {
       {/* Generated time */}
       <div className="bg-slate-800 text-slate-300 rounded-xl px-4 py-3 mb-6 flex items-center gap-2 text-xs font-mono">
         <ArrowPathIcon className="w-3.5 h-3.5" />
-        Report generated: {now.toLocaleString()} · Shift: All day
+        {t.zReport.generated}: {now.toLocaleString()} · {t.zReport.shift}
       </div>
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
         {[
-          { label: 'Gross Revenue', value: formatCurrency(Number(summary.gross_revenue)), icon: BanknotesIcon, color: 'indigo' },
-          { label: 'Net Revenue', value: formatCurrency(netRevenue), icon: BanknotesIcon, color: 'emerald' },
-          { label: 'Total Sales', value: summary.total_sales, icon: ShoppingCartIcon, color: 'violet' },
-          { label: 'Total Discounts', value: formatCurrency(Number(summary.total_discounts)), icon: BanknotesIcon, color: 'amber' },
-          { label: 'Total Tax', value: formatCurrency(Number(summary.total_tax)), icon: BanknotesIcon, color: 'slate' },
-          { label: 'Avg. Transaction', value: formatCurrency(Number(summary.avg_transaction)), icon: BanknotesIcon, color: 'slate' },
+          { label: t.zReport.grossRevenue, value: formatCurrency(Number(summary.gross_revenue)), icon: BanknotesIcon, color: 'indigo' },
+          { label: t.zReport.netRevenue, value: formatCurrency(netRevenue), icon: BanknotesIcon, color: 'emerald' },
+          { label: t.zReport.totalSales, value: summary.total_sales, icon: ShoppingCartIcon, color: 'violet' },
+          { label: t.zReport.totalDiscounts, value: formatCurrency(Number(summary.total_discounts)), icon: BanknotesIcon, color: 'amber' },
+          { label: t.zReport.totalTax, value: formatCurrency(Number(summary.total_tax)), icon: BanknotesIcon, color: 'slate' },
+          { label: t.zReport.avgTransaction, value: formatCurrency(Number(summary.avg_transaction)), icon: BanknotesIcon, color: 'slate' },
         ].map((k) => {
           const Icon = k.icon;
           return (
@@ -115,10 +117,10 @@ export default async function ZReportPage() {
 
       {/* Payment breakdown */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4">
-        <h2 className="text-sm font-bold text-slate-800 mb-4">Payment Breakdown</h2>
+        <h2 className="text-sm font-bold text-slate-800 mb-4">{t.zReport.paymentBreakdown}</h2>
         <div className="space-y-3">
           {payments.length === 0 ? (
-            <p className="text-slate-400 text-sm">No payments today</p>
+            <p className="text-slate-400 text-sm">{t.zReport.noPayments}</p>
           ) : payments.map((p: any) => (
             <div key={p.payment_method} className="flex items-center gap-3">
               <span className="text-2xl">{PM_ICON[p.payment_method] || '💰'}</span>
@@ -127,7 +129,7 @@ export default async function ZReportPage() {
                   <span className="font-semibold text-slate-700 capitalize">{p.payment_method}</span>
                   <span className="font-bold text-slate-900">{formatCurrency(Number(p.revenue))}</span>
                 </div>
-                <p className="text-xs text-slate-400">{p.count} transaction{p.count !== 1 ? 's' : ''}</p>
+                <p className="text-xs text-slate-400">{p.count} transacci{p.count !== 1 ? 'ones' : 'ón'}</p>
               </div>
             </div>
           ))}
@@ -137,13 +139,13 @@ export default async function ZReportPage() {
       {/* Top products */}
       {topProducts.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4">
-          <h2 className="text-sm font-bold text-slate-800 mb-4">Top Products Today</h2>
+          <h2 className="text-sm font-bold text-slate-800 mb-4">{t.zReport.topProducts}</h2>
           <div className="space-y-2">
             {topProducts.map((p: any, i: number) => (
               <div key={p.product_name} className="flex items-center gap-3 text-sm">
                 <span className="text-xs font-bold text-slate-300 w-5">#{i + 1}</span>
                 <span className="font-medium text-slate-700 flex-1 truncate">{p.product_name}</span>
-                <span className="text-slate-500">{p.qty} sold</span>
+                <span className="text-slate-500">{p.qty}</span>
                 <span className="font-bold text-slate-900 w-20 text-right">{formatCurrency(Number(p.revenue))}</span>
               </div>
             ))}
@@ -154,13 +156,13 @@ export default async function ZReportPage() {
       {/* Voided */}
       {voided > 0 && (
         <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-4 text-sm text-red-600">
-          ⚠️ <strong>{voided}</strong> sale{voided !== 1 ? 's' : ''} voided today
+          ⚠️ <strong>{voided}</strong> {t.zReport.voided}
         </div>
       )}
 
       {/* Footer */}
       <div className="text-center text-xs text-slate-400 mt-6 pb-4">
-        Deltux POS · End of Day Z-Report · {now.toLocaleDateString()}
+        Deltux POS · {t.zReport.title} · {now.toLocaleDateString()}
       </div>
     </div>
   );
