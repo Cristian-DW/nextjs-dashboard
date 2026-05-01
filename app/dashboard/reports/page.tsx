@@ -1,6 +1,7 @@
 import { sql } from '@/app/lib/db';
 import { playfair } from '@/app/ui/fonts';
 import Link from 'next/link';
+import { getTranslations } from '@/app/lib/i18n/server';
 import { ArrowDownTrayIcon, ChartBarIcon, CubeIcon } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/app/lib/utils';
 
@@ -71,12 +72,15 @@ export default async function ReportsPage({
   searchParams?: { period?: string };
 }) {
   const period = searchParams?.period || 'month';
-  const { summary, topProducts, paymentBreakdown } = await fetchReportData(period);
+  const [{ summary, topProducts, paymentBreakdown }, t] = await Promise.all([
+    fetchReportData(period),
+    getTranslations(),
+  ]);
 
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
-        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>Reports</h1>
+        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>{t.reports.title}</h1>
 
         {/* Export buttons */}
         <div className="flex gap-2">
@@ -84,13 +88,13 @@ export default async function ReportsPage({
             href={`/api/export/sales?period=${period}`}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
           >
-            <ArrowDownTrayIcon className="w-4 h-4" /> Sales CSV
+            <ArrowDownTrayIcon className="w-4 h-4" /> {t.reports.salesCsv}
           </a>
           <a
             href="/api/export/inventory"
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
           >
-            <ArrowDownTrayIcon className="w-4 h-4" /> Inventory CSV
+            <ArrowDownTrayIcon className="w-4 h-4" /> {t.reports.inventoryCsv}
           </a>
         </div>
       </div>
@@ -107,7 +111,7 @@ export default async function ReportsPage({
                 : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'
             }`}
           >
-            {p.label}
+            {p.key === 'today' ? t.reports.today : p.key === 'week' ? t.reports.week : p.key === 'month' ? t.reports.month : p.key === 'quarter' ? t.reports.quarter : t.reports.year}
           </Link>
         ))}
       </div>
@@ -116,10 +120,10 @@ export default async function ReportsPage({
       {summary && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'Total Revenue', value: formatCurrency(Number(summary.revenue)) },
-            { label: 'Sales Count', value: summary.total_sales.toLocaleString() },
-            { label: 'Avg. Order Value', value: formatCurrency(Number(summary.avg_order)) },
-            { label: 'Total Discounts', value: formatCurrency(Number(summary.total_discounts)) },
+            { label: t.reports.totalRevenue, value: formatCurrency(Number(summary.revenue)) },
+            { label: t.reports.salesCount, value: summary.total_sales.toLocaleString() },
+            { label: t.reports.avgOrder, value: formatCurrency(Number(summary.avg_order)) },
+            { label: t.reports.totalDiscounts, value: formatCurrency(Number(summary.total_discounts)) },
           ].map((kpi) => (
             <div key={kpi.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{kpi.label}</p>
@@ -134,10 +138,10 @@ export default async function ReportsPage({
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
             <ChartBarIcon className="w-5 h-5 text-indigo-500" />
-            <h2 className="text-sm font-bold text-slate-800">Top Products</h2>
+            <h2 className="text-sm font-bold text-slate-800">{t.reports.topProducts}</h2>
           </div>
           {topProducts.length === 0 ? (
-            <p className="text-slate-400 text-sm text-center py-10">No sales data for this period</p>
+            <p className="text-slate-400 text-sm text-center py-10">{t.reports.noSalesData}</p>
           ) : (
             <div className="space-y-3">
               {topProducts.map((p, i) => {
@@ -150,7 +154,7 @@ export default async function ReportsPage({
                         <span className="font-medium text-slate-700 truncate max-w-[180px]">{p.product_name}</span>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="text-xs font-semibold text-slate-600">{p.qty} sold</span>
+                        <span className="text-xs font-semibold text-slate-600">{p.qty} {t.reports.sold}</span>
                         <span className="text-xs text-slate-400 ml-2">{formatCurrency(Number(p.rev))}</span>
                       </div>
                     </div>
@@ -168,10 +172,10 @@ export default async function ReportsPage({
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
             <CubeIcon className="w-5 h-5 text-indigo-500" />
-            <h2 className="text-sm font-bold text-slate-800">Payment Methods</h2>
+            <h2 className="text-sm font-bold text-slate-800">{t.reports.paymentMethods}</h2>
           </div>
           {paymentBreakdown.length === 0 ? (
-            <p className="text-slate-400 text-sm text-center py-10">No data for this period</p>
+            <p className="text-slate-400 text-sm text-center py-10">{t.reports.noData}</p>
           ) : (
             <div className="space-y-3">
               {paymentBreakdown.map((pm) => {
@@ -182,8 +186,8 @@ export default async function ReportsPage({
                     <span className="text-2xl">{PMIcons[pm.payment_method] || '💰'}</span>
                     <div className="flex-1">
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-slate-700 capitalize">{pm.payment_method}</span>
-                        <span className="text-slate-500">{pm.count} txns · {pct}%</span>
+                        <span className="font-medium text-slate-700 capitalize">{pm.payment_method === 'cash' ? t.pos.cash : pm.payment_method === 'card' ? t.pos.card : pm.payment_method === 'transfer' ? t.pos.transfer : pm.payment_method}</span>
+                        <span className="text-slate-500">{pm.count} {t.reports.txns} · {pct}%</span>
                       </div>
                       <div className="h-2 bg-slate-100 rounded-full">
                         <div className="h-full bg-indigo-400 rounded-full" style={{ width: `${pct}%` }} />
