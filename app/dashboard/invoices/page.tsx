@@ -2,6 +2,7 @@ import { fetchSales, fetchSalesPages } from '@/app/lib/data';
 import { voidSale } from '@/app/lib/actions';
 import Pagination from '@/app/ui/invoices/pagination';
 import Search from '@/app/ui/search';
+import { getTranslations } from '@/app/lib/i18n/server';
 import { playfair } from '@/app/ui/fonts';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -30,19 +31,20 @@ export default async function SalesHistoryPage({
   const currentPage = Number(searchParams?.page) || 1;
   const statusFilter = searchParams?.status;
 
-  const [sales, totalPages] = await Promise.all([
+  const [sales, totalPages, t] = await Promise.all([
     fetchSales(query, currentPage, statusFilter),
     fetchSalesPages(query, statusFilter),
+    getTranslations(),
   ]);
 
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between mb-6">
-        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>Sales History</h1>
+        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>{t.sales.title}</h1>
         <Link href="/dashboard/pos"
           className="flex items-center gap-2 h-10 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/20">
           <ShoppingCartIcon className="w-4 h-4" />
-          <span className="hidden sm:inline">New Sale</span>
+          <span className="hidden sm:inline">{t.pos.newSale}</span>
         </Link>
       </div>
 
@@ -54,31 +56,30 @@ export default async function SalesHistoryPage({
               'bg-indigo-600 text-white border-indigo-600': (statusFilter || 'all') === s,
               'bg-white text-slate-600 border-slate-200 hover:border-indigo-300': (statusFilter || 'all') !== s,
             })}>
-            {s}
+            {s === 'all' ? t.sales.all : s === 'completed' ? t.sales.completed : s === 'voided' ? t.sales.voided : t.sales.refunded}
           </Link>
         ))}
       </div>
 
       <div className="mb-4">
-        <Search placeholder="Search by customer or payment…" />
+        <Search placeholder={t.sales.search} />
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {sales.length === 0 ? (
           <div className="py-20 text-center text-slate-400">
             <ShoppingCartIcon className="w-12 h-12 mx-auto mb-3" />
-            <p>No sales found.</p>
-            <Link href="/dashboard/pos" className="mt-3 inline-block text-sm text-indigo-500 hover:underline">Make your first sale →</Link>
+            <p>{t.sales.noSales}</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-50">
             {/* Header */}
             <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_1fr_auto] px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              <span>Customer</span>
-              <span>Date & Time</span>
-              <span>Items</span>
-              <span>Payment</span>
-              <span>Total</span>
+              <span>{t.sales.customer}</span>
+              <span>{t.sales.date}</span>
+              <span>{t.sales.items}</span>
+              <span>{t.sales.payment}</span>
+              <span>{t.sales.total}</span>
             </div>
             {sales.map((sale) => {
               const voidAction = voidSale.bind(null, sale.id);
@@ -93,9 +94,9 @@ export default async function SalesHistoryPage({
                       </div>
                     )}
                     <div>
-                      <p className="font-semibold text-slate-800 text-sm">{sale.customer_name || 'Walk-in'}</p>
+                      <p className="font-semibold text-slate-800 text-sm">{sale.customer_name || t.sales.walkIn}</p>
                       <span className={clsx('text-xs font-medium px-2 py-0.5 rounded-full capitalize', statusColors[sale.status] || statusColors.completed)}>
-                        {sale.status}
+                        {sale.status === 'completed' ? t.sales.completed : sale.status === 'voided' ? t.sales.voided : sale.status === 'refunded' ? t.sales.refunded : sale.status}
                       </span>
                     </div>
                   </div>
@@ -103,17 +104,17 @@ export default async function SalesHistoryPage({
                     {new Date(sale.created_at).toLocaleString()}
                   </div>
                   <div className="text-sm text-slate-600 hidden md:block">
-                    {sale.item_count} item{sale.item_count !== 1 ? 's' : ''}
+                    {sale.item_count} {t.sales.items}
                   </div>
                   <div className="hidden md:flex items-center gap-1.5 text-sm text-slate-600">
                     <span>{paymentIcons[sale.payment_method] || '💰'}</span>
-                    <span className="capitalize">{sale.payment_method}</span>
+                    <span className="capitalize">{sale.payment_method === 'cash' ? t.pos.cash : sale.payment_method === 'card' ? t.pos.card : sale.payment_method === 'transfer' ? t.pos.transfer : sale.payment_method}</span>
                   </div>
                   <div className="flex items-center gap-3 justify-end">
                     <span className="text-sm font-bold text-slate-900">{formatCurrency(sale.total)}</span>
                     {sale.status === 'completed' && (
                       <form action={voidAction}>
-                        <button type="submit" className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors">Void</button>
+                        <button type="submit" className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors">{t.sales.void}</button>
                       </form>
                     )}
                   </div>
