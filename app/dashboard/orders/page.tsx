@@ -2,6 +2,7 @@ import { sql } from '@/app/lib/db';
 import { createPurchaseOrder, receivePurchaseOrder } from '@/app/lib/actions';
 import { playfair } from '@/app/ui/fonts';
 import Link from 'next/link';
+import { getTranslations } from '@/app/lib/i18n/server';
 import { TruckIcon, PlusIcon, CheckBadgeIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 
@@ -40,46 +41,47 @@ const statusColors: Record<string, string> = {
 };
 
 export default async function PurchaseOrdersPage() {
-  const [orders, suppliers, products] = await Promise.all([
+  const [orders, suppliers, products, t] = await Promise.all([
     getPurchaseOrders(),
     getSuppliers(),
     getActiveProducts(),
+    getTranslations(),
   ]);
 
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
-        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>Purchase Orders</h1>
+        <h1 className={`${playfair.className} text-2xl md:text-4xl font-bold text-slate-900`}>{t.orders.title}</h1>
         <Link href="/dashboard/suppliers" className="flex items-center gap-2 h-10 px-4 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50">
-          <TruckIcon className="w-4 h-4" /> Suppliers
+          <TruckIcon className="w-4 h-4" /> {t.orders.suppliersLink}
         </Link>
       </div>
 
       {/* Quick create */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
         <h2 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <PlusIcon className="w-4 h-4 text-indigo-500" /> New Purchase Order
+          <PlusIcon className="w-4 h-4 text-indigo-500" /> {t.orders.newOrder}
         </h2>
         <form action={createPurchaseOrder} className="grid sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Supplier *</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t.orders.supplier} *</label>
             <select name="supplier_id" required className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
-              <option value="">— Select supplier —</option>
+              <option value="">{t.orders.selectSupplier}</option>
               {suppliers.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Expected Date</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t.orders.expectedDate}</label>
             <input name="expected_at" type="date" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Notes</label>
-            <input name="notes" placeholder="Order details or references"
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t.orders.notes}</label>
+            <input name="notes" placeholder={t.orders.notesPlaceholder}
               className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
           </div>
           <div className="sm:col-span-3 flex justify-end">
             <button type="submit" className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 shadow-md shadow-indigo-500/20">
-              Create Order
+              {t.orders.createOrder}
             </button>
           </div>
         </form>
@@ -90,17 +92,17 @@ export default async function PurchaseOrdersPage() {
         {orders.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <TruckIcon className="w-12 h-12 mx-auto mb-3" />
-            <p>No purchase orders yet. Create your first above.</p>
+            <p>{t.orders.noOrders}</p>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100">
-                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Supplier</th>
-                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:table-cell">Expected</th>
-                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Notes</th>
-                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.orders.supplierCol}</th>
+                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:table-cell">{t.orders.expected}</th>
+                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">{t.orders.notesCol}</th>
+                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.orders.status}</th>
+                <th className="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.orders.actions}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -115,14 +117,14 @@ export default async function PurchaseOrdersPage() {
                     <td className="px-5 py-4 text-slate-400 hidden md:table-cell">{order.notes || '—'}</td>
                     <td className="px-5 py-4">
                       <span className={clsx('px-2 py-1 rounded-full text-xs font-medium capitalize', statusColors[order.status] || statusColors.draft)}>
-                        {order.status}
+                        {t.orders.statuses[order.status as keyof typeof t.orders.statuses] || order.status}
                       </span>
                     </td>
                     <td className="px-5 py-4">
                       {order.status === 'ordered' && (
                         <form action={receiveAction}>
                           <button type="submit" className="flex items-center gap-1 text-xs font-medium text-emerald-600 border border-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors">
-                            <CheckBadgeIcon className="w-3.5 h-3.5" /> Mark Received
+                            <CheckBadgeIcon className="w-3.5 h-3.5" /> {t.orders.markReceived}
                           </button>
                         </form>
                       )}
@@ -130,7 +132,7 @@ export default async function PurchaseOrdersPage() {
                         <form action={receivePurchaseOrder.bind(null, order.id)}>
                           <input type="hidden" name="set_status" value="ordered" />
                           <button type="submit" className="text-xs font-medium text-blue-600 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors">
-                            Mark Ordered
+                            {t.orders.markOrdered}
                           </button>
                         </form>
                       )}
