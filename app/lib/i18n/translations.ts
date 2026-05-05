@@ -765,6 +765,6 @@ const translations = {
       na: '—',
     },
   },
-} as const;
+};
 
 export default translations;
