@@ -88,13 +88,13 @@ export default async function ReportsPage({
             href={`/api/export/sales?period=${period}`}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
           >
-            <ArrowDownTrayIcon className="w-4 h-4" /> {t.reports.salesCsv}
+            <ArrowDownTrayIcon className="w-4 h-4" /> {t.reports.exportSales}
           </a>
           <a
             href="/api/export/inventory"
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
           >
-            <ArrowDownTrayIcon className="w-4 h-4" /> {t.reports.inventoryCsv}
+            <ArrowDownTrayIcon className="w-4 h-4" /> {t.reports.exportInventory}
           </a>
         </div>
       </div>
@@ -141,7 +141,7 @@ export default async function ReportsPage({
             <h2 className="text-sm font-bold text-slate-800">{t.reports.topProducts}</h2>
           </div>
           {topProducts.length === 0 ? (
-            <p className="text-slate-400 text-sm text-center py-10">{t.reports.noSalesData}</p>
+            <p className="text-slate-400 text-sm text-center py-10">{t.reports.noDataPeriod}</p>
           ) : (
             <div className="space-y-3">
               {topProducts.map((p, i) => {
@@ -175,7 +175,7 @@ export default async function ReportsPage({
             <h2 className="text-sm font-bold text-slate-800">{t.reports.paymentMethods}</h2>
           </div>
           {paymentBreakdown.length === 0 ? (
-            <p className="text-slate-400 text-sm text-center py-10">{t.reports.noData}</p>
+            <p className="text-slate-400 text-sm text-center py-10">{t.reports.noDataPeriod}</p>
           ) : (
             <div className="space-y-3">
               {paymentBreakdown.map((pm) => {
