@@ -12,13 +12,12 @@
     "test": "jest"
   },
   "dependencies": {
-    "@cap-js/postgres": "^2.3.0",
     "@heroicons/react": "^2.0.18",
     "@tailwindcss/forms": "^0.5.7",
     "@types/node": "20.5.7",
     "@vercel/postgres": "^0.5.1",
     "autoprefixer": "10.4.15",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "next": "^14.0.2",
     "next-auth": "^5.0.0-beta.30",
@@ -36,7 +35,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",
-    "@types/bcrypt": "^5.0.1",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^29.5.11",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.14",
