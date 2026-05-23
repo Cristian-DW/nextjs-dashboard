@@ -1,0 +1,30 @@
+{
+  "name": "cap-backend",
+  "version": "1.0.0",
+  "description": "CAP Backend for Deltux POS",
+  "scripts": {
+    "start": "cds-serve",
+    "watch": "cds watch"
+  },
+  "dependencies": {
+    "@cap-js/postgres": "^2.3.0",
+    "@sap/cds": "^9.9.1",
+    "express": "^5.2.1"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "postgres",
+        "credentials": {
+          "url": { "env": "POSTGRES_URL" }
+        }
+      },
+      "auth": {
+        "kind": "dummy"
+      }
+    },
+    "features": {
+      "fetch_csrf": false
+    }
+  }
+}
