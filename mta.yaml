@@ -1,0 +1,74 @@
+_schema-version: '3.1'
+ID: deltux-pos
+version: 1.0.0
+description: "Deltux POS: Next.js UI with SAP CAP Backend"
+parameters:
+  enable-parallel-deployments: true
+
+
+modules:
+  # --------------------- APPROUTER -------------------------
+  - name: deltux-pos-approuter
+    type: approuter.nodejs
+    path: approuter
+    parameters:
+      keep-existing-routes: true
+      disk-quota: 256M
+      memory: 128M
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api
+          url: ~{srv-url}
+          forwardAuthToken: true
+      - name: ui-api
+        group: destinations
+        properties:
+          name: ui-api
+          url: ~{ui-url}
+          forwardAuthToken: true
+
+  # --------------------- CAP BACKEND ---------------------
+  - name: deltux-pos-srv
+    type: nodejs
+    path: cap-backend
+    parameters:
+      memory: 256M
+      disk-quota: 512M
+    properties:
+      # Expects POSTGRES_URL to be set via CLI after deploy or via MTA-EXT
+      POSTGRES_URL: "postgres://1a163753e11f4a98752158b8d4765e21be4dec43ef0c57aeecddea96e2176685:sk_tQjUe4z2TLhjFFeYHFJlt@db.prisma.io:5432/postgres?sslmode=require"
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+
+  # --------------------- NEXT.JS FRONTEND ---------------------
+  - name: deltux-pos-ui
+    type: nodejs
+    path: .
+    parameters:
+      memory: 512M
+      disk-quota: 1024M
+    properties:
+      POSTGRES_URL: "postgres://1a163753e11f4a98752158b8d4765e21be4dec43ef0c57aeecddea96e2176685:sk_tQjUe4z2TLhjFFeYHFJlt@db.prisma.io:5432/postgres?sslmode=require"
+      AUTH_SECRET: "hbLn+ut0cf6QYDDQN7PmT9ooTrTOatdNMN3zk0Go++U="
+      NEXTAUTH_URL: "https://a4dd2bcctrial-dev-deltux-pos-ui.cfapps.us10-001.hana.ondemand.com"
+    build-parameters:
+      builder: custom
+      build-result: .next/standalone
+      commands:
+        - npm install
+        - npm run build
+        - cp -r public .next/standalone/
+        - mkdir -p .next/standalone/.next/static
+        - cp -r .next/static .next/standalone/.next/
+    provides:
+      - name: ui-api
+        properties:
+          ui-url: ${default-url}
+    requires:
+      - name: srv-api
+        properties:
+          CAP_URL: ~{srv-url}

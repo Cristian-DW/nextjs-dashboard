@@ -1,4 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+.gitignore
+.ignore
+.env
 
 # dependencies
 /node_modules
@@ -34,3 +37,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# BTP & Modules
+approuter/node_modules/
+cap-backend/node_modules/
+mta_archives/
+.*_mta_build_tmp/
+
