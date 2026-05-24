@@ -65,7 +65,7 @@ export default async function ProductsPage({
                         <p>{t.products.noProducts}</p>
                     </div>
                 )}
-                {products.map((product) => {
+                {products.map((product: any) => {
                     const isLow = product.stock > 0 && product.stock <= product.low_stock_threshold;
                     const isOut = product.stock === 0;
                     const deleteAction = deleteProduct.bind(null, product.id);
