@@ -20,6 +20,7 @@
 
 # production
 /build
+.vercel_build_output
 
 # misc
 .DS_Store

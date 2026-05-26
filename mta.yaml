@@ -38,7 +38,7 @@ modules:
       disk-quota: 512M
     properties:
       # Expects POSTGRES_URL to be set via CLI after deploy or via MTA-EXT
-
+      POSTGRES_URL: ${POSTGRES_URL}
     provides:
       - name: srv-api
         properties:
@@ -51,6 +51,10 @@ modules:
     parameters:
       memory: 512M
       disk-quota: 1024M
+    properties:
+      POSTGRES_URL: ${POSTGRES_URL}
+      AUTH_SECRET: ${AUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
     build-parameters:
       builder: custom
       build-result: .next/standalone

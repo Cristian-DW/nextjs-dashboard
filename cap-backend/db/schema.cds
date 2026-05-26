@@ -1,34 +1,43 @@
 namespace deltux.pos;
 
-using { cuid, managed } from '@sap/cds/common';
-
-entity Categories : cuid, managed {
-  name  : String not null;
-  color : String default '#6366f1';
-  icon  : String default 'tag';
-  products : Association to many Products on products.category = $self;
+@cds.persistence.exists
+entity categories {
+  key id : UUID;
+  name : String;
+  color : String;
+  icon : String;
+  created_at : Timestamp;
+  products : Association to many products on products.category_id = $self.id;
 }
 
-entity Suppliers : cuid, managed {
-  name         : String not null;
+@cds.persistence.exists
+entity suppliers {
+  key id : UUID;
+  name : String;
   contact_name : String;
-  email        : String;
-  phone        : String;
-  address      : String;
-  notes        : String;
-  is_active    : Boolean default true;
-  products     : Association to many Products on products.supplier = $self;
+  email : String;
+  phone : String;
+  address : String;
+  notes : String;
+  is_active : Boolean;
+  created_at : Timestamp;
+  products : Association to many products on products.supplier_id = $self.id;
 }
 
-entity Products : cuid, managed {
-  name                : String not null;
-  description         : String;
-  price               : Integer not null; // in cents
-  category            : Association to Categories;
-  supplier            : Association to Suppliers;
-  sku                 : String;
-  stock               : Integer default 0;
-  low_stock_threshold : Integer default 5;
-  image_url           : String default '/products/placeholder.png';
-  is_active           : Boolean default true;
+@cds.persistence.exists
+entity products {
+  key id : UUID;
+  name : String;
+  description : String;
+  price : Integer;
+  category_id : UUID;
+  category : Association to categories on category.id = $self.category_id;
+  supplier_id : UUID;
+  supplier : Association to suppliers on supplier.id = $self.supplier_id;
+  sku : String;
+  stock : Integer;
+  low_stock_threshold : Integer;
+  image_url : String;
+  is_active : Boolean;
+  created_at : Timestamp;
 }
