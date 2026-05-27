@@ -27,11 +27,13 @@ export async function authenticate(
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':
-          return 'Invalid credentials.';
+        case 'CallbackRouteError':
+          return 'Credenciales incorrectas. Por favor verifica tu correo y contraseña.';
         default:
-          return 'Something went wrong.';
+          return 'Algo salió mal. Por favor intenta de nuevo.';
       }
     }
+    // next-auth throws a redirect internally — let it propagate
     throw error;
   }
 }
