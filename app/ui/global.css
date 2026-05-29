@@ -16,3 +16,55 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* Elegant UI Utilities */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl;
+}
+
+.dark .glass-panel {
+  @apply bg-slate-900/70 border-slate-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)];
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-500;
+}
+
+.dark .text-gradient {
+  @apply from-slate-100 to-slate-400;
+}
+
+.elegant-transition {
+  @apply transition-all duration-300 ease-out hover:scale-[1.02] active:scale-[0.98];
+}
+
+.btn-elegant {
+  @apply px-6 py-2.5 rounded-full font-medium elegant-transition shadow-sm hover:shadow-md;
+}
+
+.btn-elegant-primary {
+  @apply btn-elegant bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased selection:bg-slate-200;
+}
+
+.dark body {
+  @apply bg-[#0B1120] text-slate-100 selection:bg-slate-800;
+}
+
+/* Login error shake animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15%       { transform: translateX(-6px); }
+  30%       { transform: translateX(6px); }
+  45%       { transform: translateX(-4px); }
+  60%       { transform: translateX(4px); }
+  75%       { transform: translateX(-2px); }
+  90%       { transform: translateX(2px); }
+}
+
+.animate-shake {
+  animation: shake 0.45s ease-in-out;
+}
