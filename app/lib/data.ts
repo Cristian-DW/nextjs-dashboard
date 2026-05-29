@@ -218,6 +218,32 @@ export async function getUser(email: string) {
 export async function fetchProducts(query: string = '', page: number = 1, categoryId?: string) {
   const offset = (page - 1) * ITEMS_PER_PAGE;
   try {
+    if (process.env.CAP_URL) {
+      const url = new URL(`${process.env.CAP_URL}/odata/v4/catalog/Products`);
+      url.searchParams.append('$top', ITEMS_PER_PAGE.toString());
+      url.searchParams.append('$skip', offset.toString());
+      url.searchParams.append('$expand', 'category');
+      
+      const filters = [];
+      if (query) filters.push(`contains(name,'${query}')`);
+      if (categoryId) filters.push(`category_id eq ${categoryId}`);
+      
+      if (filters.length > 0) {
+        url.searchParams.append('$filter', filters.join(' and '));
+      }
+
+      const res = await fetch(url.toString(), { next: { revalidate: 0 } });
+      if (res.ok) {
+        const data = await res.json();
+        return data.value.map((p: any) => ({
+          ...p,
+          category_name: p.category?.name,
+          category_color: p.category?.color
+        }));
+      }
+      console.warn('CAP backend fetch failed, falling back to raw SQL');
+    }
+
     const rows = await sql<Product>`
       SELECT
         p.id, p.name, p.description, p.price, p.category_id,
