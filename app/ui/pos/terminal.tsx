@@ -43,8 +43,8 @@ function NumPad({ value, onChange, onClose }: { value: string; onChange: (v: str
   };
   const keys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '0', '.', 'DEL'];
   return (
-    <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 w-64">
-      <div className="bg-slate-50 rounded-xl px-4 py-3 text-right text-2xl font-bold text-slate-900 mb-3 min-h-[52px]">
+    <div className="glass-panel p-4 w-64 border border-slate-100/50">
+      <div className="bg-slate-50/50 backdrop-blur-md rounded-xl px-4 py-3 text-right text-2xl font-bold text-slate-900 mb-3 min-h-[52px] border border-slate-200/50 shadow-inner">
         {value || '0'}
       </div>
       <div className="grid grid-cols-3 gap-2">
@@ -59,8 +59,8 @@ function NumPad({ value, onChange, onClose }: { value: string; onChange: (v: str
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2 mt-2">
-        <button onClick={() => press('CLR')} className="h-10 rounded-xl bg-amber-50 text-amber-600 font-bold text-xs hover:bg-amber-100 transition-all">{t.pos.numPadClear}</button>
-        <button onClick={onClose} className="h-10 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 transition-all">{t.pos.numPadDone}</button>
+        <button onClick={() => press('CLR')} className="h-10 rounded-xl bg-amber-50 text-amber-600 font-bold text-xs elegant-transition hover:bg-amber-100">{t.pos.numPadClear}</button>
+        <button onClick={onClose} className="h-10 btn-elegant-primary text-xs">{t.pos.numPadDone}</button>
       </div>
     </div>
   );
@@ -80,8 +80,8 @@ function CustomItemModal({ onAdd, onClose }: { onAdd: (item: CartItem) => void; 
     onClose();
   };
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 transition-all">
+      <div className="glass-panel w-full max-w-sm p-6">
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-bold text-slate-900">{t.pos.customItem}</h3>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><XMarkIcon className="w-5 h-5" /></button>
@@ -106,9 +106,9 @@ function CustomItemModal({ onAdd, onClose }: { onAdd: (item: CartItem) => void; 
           </div>
         </div>
         <div className="flex gap-3 mt-5">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50">{t.common.cancel}</button>
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 elegant-transition hover:bg-slate-50">{t.common.cancel}</button>
           <button onClick={handleAdd} disabled={!name || !price}
-            className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-md shadow-indigo-500/20">
+            className="flex-1 btn-elegant-primary text-sm disabled:opacity-50">
             {t.pos.addToCart}
           </button>
         </div>
@@ -385,7 +385,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
       </div>
 
       {/* ━━ RIGHT: Cart Panel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <div className="w-80 xl:w-96 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden shrink-0">
+      <div className="w-80 xl:w-96 flex flex-col glass-panel shrink-0 border-l border-white/50">
 
         {/* Cart header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
@@ -505,7 +505,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
         )}
 
         {/* Totals */}
-        <div className="px-4 py-3 bg-gradient-to-b from-slate-50 to-white border-t border-slate-100 space-y-1 text-xs text-slate-500 shrink-0">
+        <div className="px-4 py-3 bg-white/40 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs text-slate-500 shrink-0">
           <div className="flex justify-between">
             <span>{t.pos.subtotal}</span>
             <span className="font-medium text-slate-600">{formatCurrency(subtotal)}</span>
@@ -525,7 +525,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
         {/* Checkout CTA */}
         <div className="p-3 shrink-0">
           <button disabled={cart.length === 0} onClick={() => setShowCheckout(true)}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 hover:from-indigo-700 hover:to-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2">
+            className="w-full py-3.5 btn-elegant-primary flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 disabled:opacity-40 disabled:cursor-not-allowed">
             <span>{t.pos.charge} {formatCurrency(total)}</span>
             <ArrowRightIcon className="w-4 h-4" />
           </button>
