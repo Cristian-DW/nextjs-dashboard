@@ -3,6 +3,18 @@
   "authenticationMethod": "none",
   "routes": [
     {
+      "source": "^/fiori/(.*)$",
+      "target": "/fiori/$1",
+      "localDir": "resources",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/api/(.*)$",
+      "target": "/api/$1",
+      "destination": "srv-api",
+      "csrfProtection": false
+    },
+    {
       "source": "^/odata/(.*)$",
       "target": "/odata/$1",
       "destination": "srv-api",

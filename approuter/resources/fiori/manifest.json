@@ -1,0 +1,123 @@
+{
+    "_version": "1.32.0",
+    "sap.app": {
+        "id": "deltux.pos.fiori",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "1.0.0"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "dataSources": {
+            "adminService": {
+                "uri": "/odata/v4/admin/",
+                "type": "OData",
+                "settings": {
+                    "odataVersion": "4.0"
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": false,
+        "dependencies": {
+            "minUI5Version": "1.90.0",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {},
+                "sap.f": {},
+                "sap.ui.layout": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "deltux.pos.fiori.i18n.i18n"
+                }
+            },
+            "": {
+                "dataSource": "adminService",
+                "settings": {
+                    "synchronizationMode": "None",
+                    "operationMode": "Server",
+                    "autoExpandSelect": true,
+                    "earlyRequests": true
+                }
+            }
+        },
+        "resources": {
+            "css": []
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewType": "XML",
+                "async": true,
+                "viewPath": "deltux.pos.fiori.view",
+                "controlAggregation": "pages",
+                "controlId": "app",
+                "clearControlAggregation": false
+            },
+            "routes": [
+                {
+                    "name": "RouteProducts",
+                    "pattern": "products",
+                    "target": [
+                        "TargetProducts"
+                    ]
+                },
+                {
+                    "name": "RouteDashboard",
+                    "pattern": "",
+                    "target": [
+                        "TargetDashboard"
+                    ]
+                }
+            ],
+            "targets": {
+                "TargetDashboard": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Dashboard",
+                    "viewName": "Dashboard"
+                },
+                "TargetProducts": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Products",
+                    "viewName": "Products"
+                }
+            }
+        },
+        "rootView": {
+            "viewName": "deltux.pos.fiori.view.App",
+            "type": "XML",
+            "async": true,
+            "id": "App"
+        }
+    }
+}

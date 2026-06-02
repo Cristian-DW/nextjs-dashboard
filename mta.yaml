@@ -38,7 +38,7 @@ modules:
       disk-quota: 512M
     properties:
       # Expects POSTGRES_URL to be set via CLI after deploy or via MTA-EXT
-      POSTGRES_URL: ${POSTGRES_URL}
+      POSTGRES_URL: "postgres://1a163753e11f4a98752158b8d4765e21be4dec43ef0c57aeecddea96e2176685:sk_tQjUe4z2TLhjFFeYHFJlt@db.prisma.io:5432/postgres?sslmode=require"
     provides:
       - name: srv-api
         properties:
@@ -52,9 +52,9 @@ modules:
       memory: 512M
       disk-quota: 1024M
     properties:
-      POSTGRES_URL: ${POSTGRES_URL}
-      AUTH_SECRET: ${AUTH_SECRET}
-      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      POSTGRES_URL: "postgres://1a163753e11f4a98752158b8d4765e21be4dec43ef0c57aeecddea96e2176685:sk_tQjUe4z2TLhjFFeYHFJlt@db.prisma.io:5432/postgres?sslmode=require"
+      AUTH_SECRET: "hbLn+ut0cf6QYDDQN7PmT9ooTrTOatdNMN3zk0Go++U="
+      NEXTAUTH_URL: "https://a4dd2bcctrial-dev-deltux-pos-ui.cfapps.us10-001.hana.ondemand.com"
     build-parameters:
       builder: custom
       build-result: .next/standalone
