@@ -1,0 +1,29 @@
+<mvc:View
+    controllerName="deltux.pos.fiori.controller.Dashboard"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:card="sap.f.cards">
+    <Page title="{i18n>dashboardTitle}" class="sapUiContentPadding">
+        <headerContent>
+            <Button icon="sap-icon://nav-back" text="Back to Next.js" press=".onNavBackToMainApp" />
+        </headerContent>
+        <content>
+            <Title text="Deltux POS Fiori Launchpad" level="H2" class="sapUiSmallMarginBottom"/>
+            
+            <HBox wrap="Wrap" class="sapUiSmallMargin">
+                <GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Products" subheader="Manage Catalog" press=".onNavToProducts">
+                    <TileContent>
+                        <ImageContent src="sap-icon://product" />
+                    </TileContent>
+                </GenericTile>
+
+                <GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Low Stock Alerts" subheader="Action Required" press=".onNavToAlerts" frameType="OneByOne">
+                    <TileContent>
+                        <NumericContent value="!" icon="sap-icon://alert" valueColor="Error" />
+                    </TileContent>
+                </GenericTile>
+            </HBox>
+        </content>
+    </Page>
+</mvc:View>
