@@ -1,0 +1,63 @@
+<mvc:View
+    controllerName="deltux.pos.fiori.controller.Products"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:layout="sap.ui.layout">
+    <f:DynamicPage id="dynamicPageId" headerExpanded="{/headerExpanded}" toggleHeaderOnTitleClick="{/titleClickable}">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Products Management"/>
+                </f:heading>
+                <f:navigationActions>
+                    <Button icon="sap-icon://nav-back" tooltip="Back" press=".onNavBack"/>
+                </f:navigationActions>
+            </f:DynamicPageTitle>
+        </f:title>
+        
+        <f:content>
+            <Table id="productsTable"
+                items="{
+                    path: '/Products',
+                    parameters: {
+                        $count: true
+                    }
+                }"
+                growing="true"
+                growingThreshold="10">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="Products" level="H2"/>
+                        <ToolbarSpacer/>
+                        <SearchField width="20%" search=".onSearch"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="Product Name" />
+                    </Column>
+                    <Column>
+                        <Text text="SKU" />
+                    </Column>
+                    <Column hAlign="End">
+                        <Text text="Price" />
+                    </Column>
+                    <Column hAlign="End">
+                        <Text text="Stock" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Navigation" press=".onItemPress">
+                        <cells>
+                            <ObjectIdentifier title="{name}" text="{description}"/>
+                            <Text text="{sku}" />
+                            <ObjectNumber number="{price}" unit="USD" />
+                            <ObjectNumber number="{stock}" state="{= ${stock} > ${low_stock_threshold} ? 'Success' : 'Error' }" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
