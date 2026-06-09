@@ -7,20 +7,28 @@
     "watch": "cds watch"
   },
   "dependencies": {
+    "@cap-js/event-broker": "^0.3.1",
     "@cap-js/postgres": "^2.3.0",
     "@sap/cds": "^9.9.1",
-    "express": "^5.2.1"
+    "@sap/xssec": "^4.13.0",
+    "express": "^5.2.1",
+    "passport": "^0.7.0"
   },
   "cds": {
     "requires": {
       "db": {
         "kind": "postgres",
         "credentials": {
-          "url": { "env": "POSTGRES_URL" }
+          "url": {
+            "env": "POSTGRES_URL"
+          }
         }
       },
       "auth": {
-        "kind": "dummy"
+        "kind": "xsuaa"
+      },
+      "messaging": {
+        "kind": "enterprise-messaging-shared"
       }
     },
     "features": {
