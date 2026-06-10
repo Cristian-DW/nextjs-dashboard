@@ -28,6 +28,7 @@ modules:
           name: ui-api
           url: ~{ui-url}
           forwardAuthToken: true
+      - name: deltux-pos-auth
 
   # --------------------- CAP BACKEND ---------------------
   - name: deltux-pos-srv
@@ -43,6 +44,9 @@ modules:
       - name: srv-api
         properties:
           srv-url: ${default-url}
+    requires:
+      - name: deltux-pos-auth
+      - name: deltux-pos-em
 
   # --------------------- NEXT.JS FRONTEND ---------------------
   - name: deltux-pos-ui
@@ -72,3 +76,20 @@ modules:
       - name: srv-api
         properties:
           CAP_URL: ~{srv-url}
+
+resources:
+  - name: deltux-pos-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: deltux-pos-auth-${org}-${space}
+        tenant-mode: dedicated
+
+  - name: deltux-pos-em
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: enterprise-messaging
+      service-plan: dev
