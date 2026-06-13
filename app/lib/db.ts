@@ -14,7 +14,9 @@ export async function sql<O extends QueryResultRow = any>(
     }, '');
 
     try {
-        const result = await pool.query<O>(query, values);
+        const result = values.length > 0 
+            ? await pool.query<O>(query, values)
+            : await pool.query<O>(query);
         return result;
     } catch (error) {
         console.error('Database Error:', error);
