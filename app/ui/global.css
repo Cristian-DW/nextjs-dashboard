@@ -68,3 +68,71 @@ body {
 .animate-shake {
   animation: shake 0.45s ease-in-out;
 }
+
+/* ─── Scrollbar hide utility ──────────────────────────────────────── */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Thermal Receipt Print (80mm) ───────────────────────────────── */
+@media print {
+  /* Hide everything except the receipt */
+  body > *:not(#thermal-receipt-root) {
+    display: none !important;
+  }
+
+  /* Target the receipt wrapper specifically */
+  .receipt-printable {
+    width: 80mm !important;
+    max-width: 80mm !important;
+    min-width: 72mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 11px !important;
+    color: #000 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Force high-contrast black & white — thermal printers love this */
+  .receipt-printable * {
+    color: #000 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Keep dividers visible */
+  .receipt-printable .border-dashed,
+  .receipt-printable .border-t {
+    border-color: #000 !important;
+  }
+
+  /* Remove print action buttons */
+  .receipt-printable button,
+  .receipt-no-print {
+    display: none !important;
+  }
+
+  /* Narrow the green header for thermal */
+  .receipt-printable .receipt-header {
+    background: #fff !important;
+    color: #000 !important;
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding: 8px 0 !important;
+  }
+
+  @page {
+    margin: 4mm;
+    size: 80mm auto;
+  }
+}
