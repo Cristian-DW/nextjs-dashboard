@@ -46,7 +46,6 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: deltux-pos-auth
-      - name: deltux-pos-em
 
   # --------------------- NEXT.JS FRONTEND ---------------------
   - name: deltux-pos-ui
@@ -88,8 +87,10 @@ resources:
         xsappname: deltux-pos-auth-${org}-${space}
         tenant-mode: dedicated
 
-  - name: deltux-pos-em
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: enterprise-messaging
-      service-plan: dev
+  # deltux-pos-em (Event Mesh) will be added here once the
+  # 'enterprise-messaging' entitlement is assigned in BTP Cockpit.
+  # - name: deltux-pos-em
+  #   type: org.cloudfoundry.managed-service
+  #   parameters:
+  #     service: enterprise-messaging
+  #     service-plan: dev
