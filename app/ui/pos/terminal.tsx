@@ -6,12 +6,14 @@ import { Product, CartItem, Category } from '@/app/lib/definitions';
 import { createSale, validateDiscountCode } from '@/app/lib/actions';
 import {
   MagnifyingGlassIcon, ShoppingCartIcon, PlusIcon, MinusIcon, TrashIcon,
-  XMarkIcon, BanknotesIcon, CreditCardIcon, ArrowPathIcon, CheckCircleIcon,
+  XMarkIcon, ArrowPathIcon, CheckCircleIcon,
   ExclamationTriangleIcon, TagIcon, UserIcon, PauseIcon, PrinterIcon,
-  PencilSquareIcon, CalculatorIcon, ArrowRightIcon, ClockIcon,
+  PencilSquareIcon, CalculatorIcon, ArrowRightIcon, SpeakerWaveIcon, SpeakerXMarkIcon,
 } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/app/lib/utils';
 import { useT } from '@/app/lib/i18n/context';
+import { useBarcodeScanner } from '@/app/lib/hooks/useBarcodeScanner';
+import { usePOSAudio } from '@/app/lib/hooks/usePOSAudio';
 import clsx from 'clsx';
 
 type PaymentMethod = 'cash' | 'card' | 'transfer' | 'split';
@@ -121,6 +123,8 @@ function CustomItemModal({ onAdd, onClose }: { onAdd: (item: CartItem) => void; 
 export default function POSTerminal({ initialProducts, categories, defaultTaxRate = 0 }: TerminalProps) {
   const router = useRouter();
   const t = useT();
+  const { play } = usePOSAudio();
+  const [audioEnabled, setAudioEnabled] = useState(true);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -141,6 +145,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
   const [showNumPad, setShowNumPad] = useState<{ field: 'cash' | 'cashInSplit' | 'cardInSplit' } | null>(null);
   const [numPadTarget, setNumPadTarget] = useState('');
   const [customerName, setCustomerName] = useState('');
+  const [scanFeedback, setScanFeedback] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   const filteredProducts = initialProducts.filter((p) => {
@@ -153,16 +158,50 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
   // ── Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // F4 → focus search bar
+      if (e.key === 'F4') {
+        e.preventDefault(); searchRef.current?.focus();
+      }
+      // / → focus search (classic shortcut)
       if (e.key === '/' && document.activeElement !== searchRef.current && !showCheckout) {
         e.preventDefault(); searchRef.current?.focus();
       }
+      // F9 → open checkout
+      if (e.key === 'F9' && cart.length > 0 && !showCheckout) {
+        e.preventDefault(); setShowCheckout(true);
+      }
+      // Esc → dismiss modals
       if (e.key === 'Escape') { setShowCheckout(false); setReceipt(null); setShowHeld(false); }
+      // Ctrl/Cmd + Enter → checkout
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && cart.length > 0) { e.preventDefault(); setShowCheckout(true); }
+      // Ctrl/Cmd + H → hold sale
       if ((e.metaKey || e.ctrlKey) && e.key === 'h') { e.preventDefault(); holdSale(); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [cart, showCheckout]);
+
+  // ── Barcode Scanner
+  useBarcodeScanner({
+    onScan: (barcode) => {
+      // Try to match by SKU first, then by name
+      const product = initialProducts.find(
+        (p) => p.sku?.toLowerCase() === barcode.toLowerCase() ||
+               p.name.toLowerCase() === barcode.toLowerCase()
+      );
+      if (product && product.stock > 0) {
+        addToCart(product);
+        if (audioEnabled) play('scan');
+        setScanFeedback(`✓ ${product.name}`);
+        setTimeout(() => setScanFeedback(null), 1500);
+      } else {
+        if (audioEnabled) play('error');
+        setScanFeedback(product ? `✗ ${t.pos.outOfStock}` : `✗ SKU: ${barcode} — not found`);
+        setTimeout(() => setScanFeedback(null), 2000);
+      }
+    },
+    enabled: !showCheckout && !showCustomItem,
+  });
 
   // ── Cart
   const addToCart = useCallback((product: Product) => {
@@ -173,6 +212,11 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
       return [...prev, { product_id: product.id, name: product.name, sku: product.sku, price: product.price, quantity: 1, total: product.price }];
     });
   }, []);
+
+  const addToCartWithSound = useCallback((product: Product) => {
+    addToCart(product);
+    if (audioEnabled) play('scan');
+  }, [addToCart, audioEnabled, play]);
 
   const addCustomItem = (item: CartItem) => setCart((p) => [...p, item]);
 
@@ -247,13 +291,17 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
     });
     setLoading(false);
     if (result.success) {
-      setReceipt({
+      if (audioEnabled) play('checkout');
+      const receiptData: ReceiptData = {
         saleId: result.saleId!, items: [...cart], subtotal, discount: discountAmt,
         tax: taxAmt, total, change: result.changeGiven || 0,
         paymentMethod: paymentMethod === 'split' ? `Split (Cash+Card)` : paymentMethod,
         couponCode: appliedDiscount?.code, customerName: customerName || undefined,
-      });
+      };
+      setReceipt(receiptData);
       clearCart(); setShowCheckout(false);
+      // Auto-open print dialog after receipt renders
+      setTimeout(() => window.print(), 400);
     }
   };
 
@@ -280,6 +328,19 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
 
   return (
     <div className="flex h-[calc(100vh-80px)] overflow-hidden gap-3 relative">
+
+      {/* ━━ Barcode Scan Feedback Toast ━━━━━━━━━━━━━━━━━━━━━━ */}
+      {scanFeedback && (
+        <div className={clsx(
+          'fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-2.5 rounded-full font-bold text-sm shadow-xl transition-all animate-bounce',
+          scanFeedback.startsWith('✓')
+            ? 'bg-emerald-500 text-white'
+            : 'bg-red-500 text-white'
+        )}>
+          {scanFeedback}
+        </div>
+      )}
+
       {/* ━━ LEFT: Product Grid ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
@@ -288,9 +349,19 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
           <div className="relative flex-1">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input ref={searchRef} value={search} onChange={(e) => setSearch(e.target.value)}
-              placeholder={t.pos.searchPlaceholder}
+              placeholder={`${t.pos.searchPlaceholder} · F4`}
               className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
+          {/* Audio toggle */}
+          <button onClick={() => setAudioEnabled(v => !v)}
+            title={audioEnabled ? 'Mute audio' : 'Enable audio'}
+            className={clsx('px-3 py-2.5 rounded-xl border bg-white text-slate-500 transition-all shadow-sm',
+              audioEnabled ? 'border-indigo-200 text-indigo-600' : 'border-slate-200'
+            )}>
+            {audioEnabled
+              ? <SpeakerWaveIcon className="w-4 h-4" />
+              : <SpeakerXMarkIcon className="w-4 h-4" />}
+          </button>
           <button onClick={() => setShowCustomItem(true)} title="Add custom item"
             className="px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-indigo-600 hover:border-indigo-300 transition-all shadow-sm">
             <PencilSquareIcon className="w-4 h-4" />
@@ -355,7 +426,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
             const outOfStock = product.stock === 0;
             const inCart = cart.find((i) => i.product_id === product.id);
             return (
-              <button key={product.id} onClick={() => !outOfStock && addToCart(product)} disabled={outOfStock}
+              <button key={product.id} onClick={() => !outOfStock && addToCartWithSound(product)} disabled={outOfStock}
                 className={clsx('relative text-left p-3 rounded-xl border bg-white shadow-sm transition-all group',
                   outOfStock ? 'opacity-40 cursor-not-allowed border-slate-100' : 'hover:shadow-md hover:border-indigo-300 active:scale-[0.97] cursor-pointer border-slate-100',
                   inCart && 'border-indigo-200 bg-indigo-50/30'
@@ -529,7 +600,7 @@ export default function POSTerminal({ initialProducts, categories, defaultTaxRat
             <span>{t.pos.charge} {formatCurrency(total)}</span>
             <ArrowRightIcon className="w-4 h-4" />
           </button>
-          <p className="text-center text-[10px] text-slate-300 mt-1.5">{t.pos.checkoutShortcuts}</p>
+          <p className="text-center text-[10px] text-slate-300 mt-1.5">F9 · ⌘↩ cobrar · ⌘H pausar</p>
         </div>
       </div>
 
