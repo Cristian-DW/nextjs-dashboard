@@ -7,7 +7,6 @@
     "watch": "cds watch"
   },
   "dependencies": {
-    "@cap-js/event-broker": "^0.3.1",
     "@cap-js/postgres": "^2.3.0",
     "@sap/cds": "^9.9.1",
     "@sap/xssec": "^4.13.0",
@@ -25,10 +24,7 @@
         }
       },
       "auth": {
-        "kind": "xsuaa"
-      },
-      "messaging": {
-        "kind": "enterprise-messaging-shared"
+        "kind": "dummy"
       }
     },
     "features": {
