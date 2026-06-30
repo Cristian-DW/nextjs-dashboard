@@ -6,14 +6,17 @@ export const authConfig = {
         signIn: '/login',
     },
     callbacks: {
-        authorized({ auth, request: { nextUrl } }) {
+        authorized({ auth, request }) {
+            const { nextUrl } = request;
             const isLoggedIn = !!auth?.user;
             const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
             if (isOnDashboard) {
                 if (isLoggedIn) return true;
                 return false; // Redirect unauthenticated users to login page
             } else if (isLoggedIn) {
-                return Response.redirect(new URL('/dashboard', nextUrl));
+                const baseUrl = process.env.NEXTAUTH_URL || 
+                                (request.headers.get('x-forwarded-host') ? `https://${request.headers.get('x-forwarded-host')}` : nextUrl.origin);
+                return Response.redirect(new URL('/dashboard', baseUrl));
             }
             return true;
         },
