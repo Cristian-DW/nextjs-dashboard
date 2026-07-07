@@ -6,20 +6,14 @@ export const authConfig = {
         signIn: '/login',
     },
     callbacks: {
-        authorized({ auth, request }) {
-            const { nextUrl } = request;
+        authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
             if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
-            } else if (isLoggedIn) {
-                const baseUrl = process.env.NEXTAUTH_URL || 
-                                (request.headers.get('x-forwarded-host') ? `https://${request.headers.get('x-forwarded-host')}` : nextUrl.origin);
-                return Response.redirect(new URL('/dashboard', baseUrl));
+                return isLoggedIn; // Redirect unauthenticated to /login automatically
             }
-            return true;
+            return true; // Allow access to all other pages
         },
     },
-    providers: [], // Add providers with an empty array for now
+    providers: [],
 } satisfies NextAuthConfig;
