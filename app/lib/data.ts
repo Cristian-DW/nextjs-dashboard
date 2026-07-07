@@ -436,13 +436,15 @@ export async function fetchAnalyticsSummary(): Promise<AnalyticsSummary> {
 
 export async function fetchDailyRevenue(days: number = 14): Promise<DailyRevenue[]> {
   try {
+    // INTERVAL cannot be parameterised — use safe integer cast and inline it
+    const safeDays = Math.max(1, Math.min(365, Math.floor(days)));
     const rows = await sql<DailyRevenue>`
       SELECT
         TO_CHAR(DATE_TRUNC('day', created_at), 'Mon DD') AS day,
         COALESCE(SUM(total), 0) AS revenue
       FROM sales
       WHERE status = 'completed'
-        AND created_at >= NOW() - INTERVAL '${days} days'
+        AND created_at >= NOW() - (${safeDays} * INTERVAL '1 day')
       GROUP BY DATE_TRUNC('day', created_at)
       ORDER BY DATE_TRUNC('day', created_at) ASC
     `;
@@ -481,7 +483,7 @@ export async function fetchHourlySales(): Promise<HourlyData[]> {
         EXTRACT(HOUR FROM created_at)::int AS hour,
         COUNT(*)::int AS sale_count
       FROM sales
-      WHERE status = 'completed' AND created_at >= NOW() - INTERVAL '30 days'
+      WHERE status = 'completed' AND created_at >= NOW() - (30 * INTERVAL '1 day')
       GROUP BY hour
       ORDER BY hour ASC
     `;
