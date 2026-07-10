@@ -8,16 +8,46 @@ import {
   EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
-import { useFormState, useFormStatus } from 'react-dom';
-import { authenticate } from '@/app/lib/actions';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { signIn } from 'next-auth/react';
 
 export default function LoginForm() {
-  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setErrorMessage(undefined);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    startTransition(async () => {
+      try {
+        const result = await signIn('credentials', {
+          email,
+          password,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          setErrorMessage('Credenciales incorrectas. Por favor verifica tu correo y contraseña.');
+        } else if (result?.ok) {
+          // Use window.location for reliable redirect through BTP proxies
+          window.location.href = '/dashboard';
+        } else {
+          setErrorMessage('Algo salió mal. Por favor intenta de nuevo.');
+        }
+      } catch {
+        setErrorMessage('Error de conexión. Por favor intenta de nuevo.');
+      }
+    });
+  }
 
   return (
-    <form action={dispatch} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="rounded-2xl bg-white shadow-xl shadow-slate-200/60 border border-slate-100 px-8 pb-8 pt-8">
         {/* Header */}
         <div className="mb-6">
@@ -31,7 +61,7 @@ export default function LoginForm() {
 
         {/* Error banner */}
         {errorMessage && (
-          <div className="mb-4 flex items-start gap-3 rounded-xl bg-red-50 border border-red-100 p-4 animate-shake">
+          <div className="mb-4 flex items-start gap-3 rounded-xl bg-red-50 border border-red-100 p-4">
             <ExclamationCircleIcon className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold text-red-700">Error al iniciar sesión</p>
@@ -99,42 +129,35 @@ export default function LoginForm() {
         </div>
 
         {/* Submit button */}
-        <LoginButton />
+        <button
+          id="login-submit-btn"
+          type="submit"
+          disabled={isPending}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
+        >
+          {isPending ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <span>Iniciando sesión...</span>
+            </>
+          ) : (
+            <>
+              <span>Iniciar Sesión</span>
+              <ArrowRightIcon className="h-4 w-4" />
+            </>
+          )}
+        </button>
 
-        {/* Footer hint */}
-        <p className="mt-4 text-center text-xs text-slate-400">
-          ¿Problemas para ingresar? Contacta a tu administrador.
-        </p>
+        {/* Demo credentials hint */}
+        <div className="mt-4 rounded-lg bg-indigo-50 border border-indigo-100 p-3">
+          <p className="text-xs text-indigo-600 font-medium text-center">
+            Demo: user@nextmail.com / 123456
+          </p>
+        </div>
       </div>
     </form>
-  );
-}
-
-function LoginButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <button
-      id="login-submit-btn"
-      type="submit"
-      aria-disabled={pending}
-      disabled={pending}
-      className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
-    >
-      {pending ? (
-        <>
-          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          <span>Iniciando sesión...</span>
-        </>
-      ) : (
-        <>
-          <span>Iniciar Sesión</span>
-          <ArrowRightIcon className="h-4 w-4" />
-        </>
-      )}
-    </button>
   );
 }
