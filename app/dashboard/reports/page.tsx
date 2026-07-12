@@ -6,43 +6,55 @@ import { ArrowDownTrayIcon, ChartBarIcon, CubeIcon } from '@heroicons/react/24/o
 import { formatCurrency } from '@/app/lib/utils';
 
 async function fetchReportData(period: string) {
-  const intervals: Record<string, string> = {
-    today: '1 day',
-    week: '7 days',
-    month: '30 days',
-    quarter: '90 days',
-    year: '365 days',
+  const intervalDays: Record<string, number> = {
+    today: 1,
+    week: 7,
+    month: 30,
+    quarter: 90,
+    year: 365,
   };
-  const interval = intervals[period] || intervals.month;
+  const days = intervalDays[period] ?? 30;
 
   try {
-    const [salesRes, topRes, paymentRes] = await Promise.all([
+    const [salesRes, topRes, paymentRes, dailyRes] = await Promise.all([
       sql`
         SELECT
           COUNT(*)::int AS total_sales,
           COALESCE(SUM(total), 0) AS revenue,
           COALESCE(AVG(total), 0) AS avg_order,
-          COALESCE(SUM(discount_amount), 0) AS total_discounts
+          COALESCE(SUM(discount_amount), 0) AS total_discounts,
+          COALESCE(SUM(tax_amount), 0) AS total_tax
         FROM sales
         WHERE status = 'completed'
-          AND created_at >= NOW() - CAST(${interval} AS INTERVAL)
+          AND created_at >= NOW() - (${days} * INTERVAL '1 day')
       `,
       sql`
         SELECT si.product_name, SUM(si.quantity)::int AS qty, SUM(si.total) AS rev
         FROM sale_items si
         JOIN sales s ON s.id = si.sale_id
         WHERE s.status = 'completed'
-          AND s.created_at >= NOW() - CAST(${interval} AS INTERVAL)
+          AND s.created_at >= NOW() - (${days} * INTERVAL '1 day')
         GROUP BY si.product_name
         ORDER BY qty DESC
         LIMIT 10
       `,
       sql`
-        SELECT payment_method, COUNT(*)::int AS count, SUM(total) AS revenue
+        SELECT payment_method, COUNT(*)::int AS count, COALESCE(SUM(total),0) AS revenue
         FROM sales
         WHERE status = 'completed'
-          AND created_at >= NOW() - CAST(${interval} AS INTERVAL)
+          AND created_at >= NOW() - (${days} * INTERVAL '1 day')
         GROUP BY payment_method
+      `,
+      sql`
+        SELECT
+          TO_CHAR(DATE_TRUNC('day', created_at), 'Mon DD') AS day,
+          COALESCE(SUM(total), 0) AS revenue,
+          COUNT(*)::int AS count
+        FROM sales
+        WHERE status = 'completed'
+          AND created_at >= NOW() - (${days} * INTERVAL '1 day')
+        GROUP BY DATE_TRUNC('day', created_at)
+        ORDER BY DATE_TRUNC('day', created_at) ASC
       `,
     ]);
 
@@ -50,9 +62,11 @@ async function fetchReportData(period: string) {
       summary: salesRes.rows[0],
       topProducts: topRes.rows,
       paymentBreakdown: paymentRes.rows,
+      dailyRevenue: dailyRes.rows,
     };
   } catch (e) {
-    return { summary: null, topProducts: [], paymentBreakdown: [] };
+    console.error('Report fetch error:', e);
+    return { summary: null, topProducts: [], paymentBreakdown: [], dailyRevenue: [] };
   }
 }
 
