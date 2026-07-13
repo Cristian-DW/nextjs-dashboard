@@ -1,11 +1,23 @@
 {
-  "welcomeFile": "/index.html",
   "authenticationMethod": "route",
   "routes": [
     {
       "source": "^/fiori/(.*)$",
       "target": "/fiori/$1",
       "localDir": "resources",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/api/auth/(.*)$",
+      "target": "/api/auth/$1",
+      "destination": "ui-api",
+      "csrfProtection": false,
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/api/export/(.*)$",
+      "target": "/api/export/$1",
+      "destination": "ui-api",
       "csrfProtection": false
     },
     {
