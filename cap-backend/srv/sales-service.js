@@ -21,15 +21,20 @@ module.exports = class SalesService extends cds.ApplicationService {
       }
     });
 
-    // ── Emit Event Mesh message after sale is created ─────────────────────────
-    this.after('CREATE', POSSales, async (data, req) => {
-      const messaging = await cds.connect.to('messaging');
-      messaging.emit('deltux/pos/Sales/Created', {
-        sale_id: data.id,
-        total_amount: data.total_amount,
-        timestamp: data.sale_date
-      });
-      console.log(`[Event Mesh] Emitted deltux/pos/Sales/Created for sale ${data.id}`);
+    // ── Emit Event Mesh message after sale is created (optional — skipped if not configured) ──
+    this.after('CREATE', POSSales, async (data) => {
+      try {
+        const messaging = await cds.connect.to('messaging');
+        await messaging.emit('deltux/pos/Sales/Created', {
+          sale_id: data.id,
+          total_amount: data.total_amount,
+          timestamp: data.sale_date
+        });
+        console.log(`[Event Mesh] Emitted deltux/pos/Sales/Created for sale ${data.id}`);
+      } catch (e) {
+        // Event Mesh not configured — safe to skip
+        console.log('[Event Mesh] Messaging not configured, skipping event emission.');
+      }
     });
 
     // ── Auto-compute invoice totals ────────────────────────────────────────
