@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { COOKIE_NAME } from '@/app/lib/session';
 
-const COOKIE_NAME_LOCAL = 'deltux_session';
+const SESSION_COOKIE = 'deltux_session';
 
 export async function POST() {
   const response = NextResponse.json({ success: true });
   response.cookies.set({
-    name: COOKIE_NAME_LOCAL,
+    name: SESSION_COOKIE,
     value: '',
     httpOnly: true,
     maxAge: 0,
