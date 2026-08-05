@@ -5,37 +5,14 @@ import { sql } from './db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { signIn } from '@/auth';
-import { AuthError } from 'next-auth';
 import { CartItem } from './definitions';
 
 // ─────────────────────────────────────────
-// AUTH & LOCALE
+// LOCALE
 // ─────────────────────────────────────────
 
 export async function setLocaleCookie(locale: string) {
   cookies().set('deltux_pos_locale', locale, { path: '/' });
-}
-
-export async function authenticate(
-  prevState: string | undefined,
-  formData: FormData,
-) {
-  try {
-    await signIn('credentials', formData);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-        case 'CallbackRouteError':
-          return 'Credenciales incorrectas. Por favor verifica tu correo y contraseña.';
-        default:
-          return 'Algo salió mal. Por favor intenta de nuevo.';
-      }
-    }
-    // next-auth throws a redirect internally — let it propagate
-    throw error;
-  }
 }
 
 // ─────────────────────────────────────────
