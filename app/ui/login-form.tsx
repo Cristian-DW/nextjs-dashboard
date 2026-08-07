@@ -9,7 +9,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { useState, useTransition } from 'react';
-import { signIn } from 'next-auth/react';
 
 export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
@@ -26,19 +25,20 @@ export default function LoginForm() {
 
     startTransition(async () => {
       try {
-        const result = await signIn('credentials', {
-          email,
-          password,
-          redirect: false,
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+          credentials: 'include',
         });
 
-        if (result?.error) {
-          setErrorMessage('Credenciales incorrectas. Por favor verifica tu correo y contraseña.');
-        } else if (result?.ok) {
-          // Use window.location for reliable redirect through BTP proxies
-          window.location.href = '/dashboard';
+        const data = await res.json();
+
+        if (!res.ok) {
+          setErrorMessage(data.error || 'Credenciales incorrectas. Por favor verifica tu correo y contraseña.');
         } else {
-          setErrorMessage('Algo salió mal. Por favor intenta de nuevo.');
+          // Successful login — navigate to dashboard
+          window.location.href = '/dashboard';
         }
       } catch {
         setErrorMessage('Error de conexión. Por favor intenta de nuevo.');
@@ -151,7 +151,7 @@ export default function LoginForm() {
           )}
         </button>
 
-        {/* Demo credentials hint */}
+        {/* Demo hint */}
         <div className="mt-4 rounded-lg bg-indigo-50 border border-indigo-100 p-3">
           <p className="text-xs text-indigo-600 font-medium text-center">
             Demo: user@nextmail.com / 123456
